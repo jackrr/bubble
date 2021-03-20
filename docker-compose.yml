@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: local
+      POSTGRES_USER: bubble
+    ports:
+      - 5432:5432
+    volumes:
+      - ./_local_db/db:/var/lib/postgresql/data

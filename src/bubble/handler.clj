@@ -1,11 +1,14 @@
 (ns bubble.handler
-  (:require [compojure.core :refer :all]
+  (:require [bubble.db :as db]
+            [bubble.views :as views]
+            [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
 (defroutes app-routes
-  (GET "/" [] "Hello World")
+  (GET "/" [] (views/index-page (db/bubble-count)))
   (route/not-found "Not Found"))
 
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (-> app-routes
+      (wrap-defaults site-defaults)))
