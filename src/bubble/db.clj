@@ -13,3 +13,7 @@
 
 (defn bubble-count []
   (:count (sql/execute-one! ds ["select count(*) from bubbles"])))
+
+(defn make-bubble [name]
+  (sql/execute-one! ds ["INSERT INTO bubbles (name) VALUES (?)" name]
+                     {:return-keys true}))

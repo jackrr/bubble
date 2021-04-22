@@ -48,7 +48,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public.bubbles (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    name character varying(512)
 );
 
 
@@ -94,4 +95,5 @@ CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.bubbles FOR EACH ROW EXECUT
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20210320172456');
+    ('20210320172456'),
+    ('20210422000610');
