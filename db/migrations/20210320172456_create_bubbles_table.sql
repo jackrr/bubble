@@ -22,5 +22,5 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 
 
 -- migrate:down
-DELETE TABLE bubbles;
-DELETE function trigger_set_timestamp;
+DROP TABLE bubbles;
+DROP function trigger_set_timestamp;

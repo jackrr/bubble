@@ -1,19 +1,10 @@
 (ns bubble.db
   (:require [next.jdbc :as sql]
-            [clojure.tools.logging :as log]
-            [environ.core :refer [env]]))
-
-(def db-conf {:dbtype "postgres"
-              :dbname "bubble"
-              :user "bubble"
-              :password (env :db-password)
-              :port 5432})
-
-(def ds (sql/get-datasource db-conf))
+            [bubble.db.base :refer [db]]))
 
 (defn bubble-count []
-  (:count (sql/execute-one! ds ["select count(*) from bubbles"])))
+  (:count (sql/execute-one! db ["select count(*) from bubbles"])))
 
 (defn make-bubble [name]
-  (sql/execute-one! ds ["INSERT INTO bubbles (name) VALUES (?)" name]
-                     {:return-keys true}))
+  (sql/execute-one! db ["INSERT INTO bubbles (name) VALUES (?)" name]
+                    {:return-keys true}))
