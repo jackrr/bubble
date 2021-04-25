@@ -3,6 +3,7 @@
             [bubble.views :as views]
             [compojure.core :refer :all]
             [compojure.route :as route]
+            [ring.logger :as logger]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
 (defn display-result [req]
@@ -26,4 +27,5 @@
 
 (def app
   (-> app-routes
-      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))
+      (logger/wrap-with-logger)))

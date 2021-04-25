@@ -9,7 +9,8 @@
                  [com.github.seancorfield/next.jdbc "1.1.646"]
                  [org.postgresql/postgresql "42.2.19.jre7"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [ring/ring-defaults "0.3.2"]]
+                 [ring/ring-defaults "0.3.2"]
+                 [ring-logger "1.0.1"]]
   :plugins [[lein-environ "1.2.0"]
             [lein-ring "0.12.5"]]
   :ring {:handler bubble.handler/app}
