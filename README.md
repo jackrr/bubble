@@ -28,7 +28,3 @@ To start a web server for the application, run:
 ``` sh
 lein ring server
 ```
-
-## License
-
-This project is open source according to the GNU Public License V3. See LICENSE for more information.
