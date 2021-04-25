@@ -17,10 +17,10 @@ Additionally, this project uses [dbmate](https://github.com/amacneil/dbmate) to 
 
 ## Running
 
-First, kick off a posql process:
+First, kick off postgresql and redis servers via docker-compose:
 
 ``` sh
-docker-compose up -d postgres
+docker-compose up -d postgres redis
 ```
 
 To start a web server for the application, run:
