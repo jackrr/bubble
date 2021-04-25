@@ -63,6 +63,19 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    name text,
+    phone text
+);
+
+
+--
 -- Name: bubbles bubbles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -79,10 +92,33 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: users users_phone_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_phone_key UNIQUE (phone);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: bubbles set_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.bubbles FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
+-- Name: users set_user_timestamp; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_user_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
 --
@@ -96,4 +132,5 @@ CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.bubbles FOR EACH ROW EXECUT
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20210320172456'),
-    ('20210422000610');
+    ('20210422000610'),
+    ('20210425160954');
