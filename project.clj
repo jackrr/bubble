@@ -3,6 +3,7 @@
   :url "https://github.com/jackrr/bubble"
   :min-lein-version "2.0.0"
   :dependencies [[compojure "1.6.1"]
+                 [digest "1.4.10"]
                  [environ "1.2.0"]
                  [hiccup "1.0.5"]
                  [com.github.seancorfield/next.jdbc "1.1.646"]

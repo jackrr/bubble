@@ -1,6 +1,10 @@
 (ns bubble.login
-  (:require [bubble.db :as db]
-            [bubble.views :as views]))
+  (:require [bubble.crypto :as crypto]
+            [bubble.db :as db]
+            [bubble.db.users :as users]
+            [bubble.mem-store :as mem-store]
+            [bubble.views :as views]
+            [ring.util.response :refer [redirect]]))
 
 (defn form-page []
   (views/base-view [[:h1 "Login"]
@@ -8,11 +12,39 @@
                      [:input {:name "phone" :placeholder "Phone #"}]
                      [:button {:name "submit"} "Send me a link"]]]))
 
+(defn parse-phone [st]
+  (let [match (re-find
+               (re-matcher
+                #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
+                st))
+        res (if (nil? match) nil (drop 1 match))]
+    (when res
+      (apply str (if (= "" (first res)) (into [1] res) res)))))
+
 (defn handle-request [req]
-  (let [{:keys [params]} req]
-    ;; TODO: find or create user by phone param
-    ;; TODO: generate a login code (unique guarantees, expiry)
-    ;; TODO: store login code --> user id in redis
+  (let [{:keys [params]} req
+        phone (-> params
+                  :phone
+                  parse-phone)]
+    (if phone
+      (let [user (users/find-or-create! {:phone phone})
+            login-code (crypto/gen-login-code)]
+        (mem-store/store-login-code login-code (:id user))
     ;; TODO: send SMS of URL w/ code to phone
-    ;; TODO: redirect to page saying to check for text message w/ URL
-    (:phone params)))
+    ;; TODO: render page saying to check for text message w/ URL
+        )
+      (redirect (str "/login?" (ring.util.codec/form-encode {:error "Invalid phone # provided"}))))))
+
+(comment
+  (count nil)
+  (str ["1" "210" "863"])
+  (parse-phone "(210) 8632322")
+  (re-find
+   (re-matcher
+    #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
+    "5"))
+  (drop 1 (re-find
+           (re-matcher
+            #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
+            "1 2108632322")))
+  (print ""))
