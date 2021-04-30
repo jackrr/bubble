@@ -45,3 +45,7 @@ owns.
   - Need to prevent collisions, make brute force generation undesirable
 - Redirect logic in backend
 - Generally-available user object on authed requests
+
+## Add-ons
+
+- Support sending a simple string of numbers that can be used for web login

@@ -2,6 +2,7 @@
   (:require
    [digest :refer [sha1]]))
 
+;; TODO: login code should be 6-digit number, check datastore for uniqueness
 (defn rand-str [len]
   (apply str (take len (repeatedly #(char (+ (rand 26) 65))))))
 
@@ -11,5 +12,6 @@
       sha1))
 
 (comment
+  (rand-str 10)
   (gen-login-code)
   (print ""))

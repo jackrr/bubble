@@ -3,13 +3,16 @@
   :url "https://github.com/jackrr/bubble"
   :min-lein-version "2.0.0"
   :dependencies [[compojure "1.6.1"]
+                 [clj-http "3.12.0"]
                  [digest "1.4.10"]
                  [environ "1.2.0"]
                  [hiccup "1.0.5"]
                  [com.github.seancorfield/next.jdbc "1.1.646"]
                  [com.taoensso/carmine "3.1.0"]
+                 [lynxeyes/dotenv "1.1.0"]
                  [org.clojure/clojure "1.10.0"]
                  [org.postgresql/postgresql "42.2.19.jre7"]
+                 [org.clojure/data.json "2.2.2"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring-logger "1.0.1"]]

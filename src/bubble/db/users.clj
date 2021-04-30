@@ -2,6 +2,7 @@
   (:require [next.jdbc :as sql]
             [bubble.db.base :refer [db]]))
 
+;; TODO: move this to login namespace, don't need MVC
 (defn find-or-create! [{:keys [phone]}]
   (sql/with-transaction [tx db]
     (let [user (sql/execute-one! tx ["select * from users where phone = ?" phone])]

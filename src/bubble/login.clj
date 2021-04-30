@@ -6,6 +6,7 @@
             [bubble.views :as views]
             [ring.util.response :refer [redirect]]))
 
+;; TODO: Handle error query param
 (defn form-page []
   (views/base-view [[:h1 "Login"]
                     [:form {:action "/login" :method "post"}
@@ -42,7 +43,7 @@
   (re-find
    (re-matcher
     #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
-    "5"))
+    "55555555555"))
   (drop 1 (re-find
            (re-matcher
             #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
