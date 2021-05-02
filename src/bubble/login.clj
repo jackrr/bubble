@@ -1,9 +1,8 @@
 (ns bubble.login
-  (:require [bubble.crypto :as crypto]
-            [bubble.db :as db]
-            [bubble.db.users :as users]
-            [bubble.mem-store :as mem-store]
+  (:require [bubble.db.base :refer [db]]
+            [bubble.login.code :as code]
             [bubble.views :as views]
+            [next.jdbc :as sql]
             [ring.util.response :refer [redirect]]))
 
 ;; TODO: Handle error query param
@@ -12,6 +11,12 @@
                     [:form {:action "/login" :method "post"}
                      [:input {:name "phone" :placeholder "Phone #"}]
                      [:button {:name "submit"} "Send me a link"]]]))
+
+(defn find-or-create-user! [{:keys [phone]}]
+  (sql/with-transaction [tx db]
+    (let [user (sql/execute-one! tx ["select * from users where phone = ?" phone])]
+      (or user
+          (sql/execute-one! tx ["insert into users (phone) values (?)" phone] {:return-keys true})))))
 
 (defn parse-phone [st]
   (let [match (re-find
@@ -28,9 +33,9 @@
                   :phone
                   parse-phone)]
     (if phone
-      (let [user (users/find-or-create! {:phone phone})
-            login-code (crypto/gen-login-code)]
-        (mem-store/store-login-code login-code (:id user))
+      (let [user (find-or-create-user! {:phone phone})
+            login-code (code/gen-code)]
+        (code/store-code login-code (:id user))
     ;; TODO: send SMS of URL w/ code to phone
     ;; TODO: render page saying to check for text message w/ URL
         )
