@@ -22,5 +22,4 @@
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
-         :env {:db-password "local"
-               :redis-conn "redis://localhost:6379/0"}}})
+         :env {:db-password "local"}}})
