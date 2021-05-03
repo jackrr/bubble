@@ -5,7 +5,9 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.logger :as logger]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.session.cookie :as ring-cookie]))
 
 (defn display-result [req]
   (let [{:keys [params uri]} req
@@ -25,11 +27,14 @@
   ;; TODO: redirect to login if not logged in
   (GET "/" [] (views/index-page (db/bubble-count)))
   (POST "/newbubble" req (display-result req))
-  (GET "/login" [] (login/form-page))
+  (GET "/login" req (login/form-page req))
   (POST "/login" req (login/handle-request req))
   (route/not-found "Not Found"))
 
 (def app
   (-> app-routes
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))
-      (logger/wrap-with-logger)))
+      (logger/wrap-with-logger)
+      (wrap-session {:store (ring-cookie/cookie-store {:key "MSHCSGBAVHWTGJNA"})
+                     :cookie-attrs {:max-age 3600
+                                    :secure true}})))

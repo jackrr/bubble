@@ -3,14 +3,17 @@
             [bubble.login.code :as code]
             [bubble.views :as views]
             [next.jdbc :as sql]
-            [ring.util.response :refer [redirect]]))
+            [ring.util.response :refer [content-type redirect response]]))
 
 ;; TODO: Handle error query param
-(defn form-page []
-  (views/base-view [[:h1 "Login"]
-                    [:form {:action "/login" :method "post"}
-                     [:input {:name "phone" :placeholder "Phone #"}]
-                     [:button {:name "submit"} "Send me a link"]]]))
+(defn form-page [{:keys [session]}]
+  (println session)
+  (-> (response (views/base-view [[:h1 "Login"]
+                                  [:form {:action "/login" :method "post"}
+                                   [:input {:name "phone" :placeholder "Phone #"}]
+                                   [:button {:name "submit"} "Send me a link"]]]))
+      (content-type "text/html")
+      (assoc :session {:test "Hello!"})))
 
 (defn find-or-create-user! [{:keys [phone]}]
   (sql/with-transaction [tx db]
