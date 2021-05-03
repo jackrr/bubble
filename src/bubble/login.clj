@@ -1,19 +1,36 @@
 (ns bubble.login
   (:require [bubble.db.base :refer [db]]
             [bubble.login.code :as code]
+            [bubble.login.session :as session]
             [bubble.views :as views]
             [next.jdbc :as sql]
             [ring.util.response :refer [content-type redirect response]]))
 
-;; TODO: Handle error query param
-(defn form-page [{:keys [session]}]
-  (println session)
-  (-> (response (views/base-view [[:h1 "Login"]
-                                  [:form {:action "/login" :method "post"}
-                                   [:input {:name "phone" :placeholder "Phone #"}]
-                                   [:button {:name "submit"} "Send me a link"]]]))
-      (content-type "text/html")
-      (assoc :session {:test "Hello!"})))
+(defn login-error-redirect [error-message]
+  (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
+
+(defn auth-wall [req ok]
+  (let [user (session/current-user req)]
+    (if user
+      ok
+      (login-error-redirect "You must be logged in to see that"))))
+
+(defn form-page [req]
+  (let [user (session/current-user req)
+        error (get-in req [:params :error])]
+    (views/base-view [[:h1 "Login"]
+                      (when error [:p (str "Error: " error)])
+                      [:form {:action "/login" :method "post"}
+                       [:input {:name "phone" :placeholder "Phone #"}]
+                       [:button {:name "submit"} "Send me a link"]]])))
+
+(defn handle-code [{{code :code} :params}]
+  (let [user-id (code/user-id-for-code code)
+        session-id (when user-id (session/create-session user-id))]
+    (if session-id
+      (-> (redirect "/")
+          (assoc :session {:session-id session-id}))
+      (login-error-redirect "Invalid or expired code. Please try again."))))
 
 (defn find-or-create-user! [{:keys [phone]}]
   (sql/with-transaction [tx db]
@@ -38,11 +55,12 @@
     (if phone
       (let [user (find-or-create-user! {:phone phone})
             login-code (code/gen-code)]
-        (code/store-code login-code (:id user))
+        (code/store-code login-code (:users/id user))
     ;; TODO: send SMS of URL w/ code to phone
     ;; TODO: render page saying to check for text message w/ URL
-        )
-      (redirect (str "/login?" (ring.util.codec/form-encode {:error "Invalid phone # provided"}))))))
+    ;; TODO: delete this link rendering as it is not a real auth test
+        (views/base-view [[:a {:href (str "/login-code/" login-code)} "(TMP) Complete login"]]))
+      (login-error-redirect  "Invalid phone # provided"))))
 
 (comment
   (count nil)

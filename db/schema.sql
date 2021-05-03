@@ -54,11 +54,38 @@ CREATE TABLE public.bubbles (
 
 
 --
+-- Name: login_codes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.login_codes (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    expires_at timestamp without time zone DEFAULT now() NOT NULL,
+    code text NOT NULL,
+    user_id uuid
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
     version character varying(255) NOT NULL
+);
+
+
+--
+-- Name: sessions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sessions (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    expires_at timestamp without time zone DEFAULT now() NOT NULL,
+    user_id uuid
 );
 
 
@@ -84,11 +111,27 @@ ALTER TABLE ONLY public.bubbles
 
 
 --
+-- Name: login_codes login_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login_codes
+    ADD CONSTRAINT login_codes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
 
 
 --
@@ -108,6 +151,20 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: login_codes set_login_code_timestamp; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_login_code_timestamp BEFORE UPDATE ON public.login_codes FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
+-- Name: sessions set_session_timestamp; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_session_timestamp BEFORE UPDATE ON public.sessions FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
 -- Name: bubbles set_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -122,6 +179,22 @@ CREATE TRIGGER set_user_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXE
 
 
 --
+-- Name: login_codes login_codes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login_codes
+    ADD CONSTRAINT login_codes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -133,4 +206,6 @@ CREATE TRIGGER set_user_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXE
 INSERT INTO public.schema_migrations (version) VALUES
     ('20210320172456'),
     ('20210422000610'),
-    ('20210425160954');
+    ('20210425160954'),
+    ('20210503024315'),
+    ('20210503033824');

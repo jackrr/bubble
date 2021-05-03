@@ -1,5 +1,6 @@
 (ns bubble.db.base
   (:require [next.jdbc :as sql]
+            [next.jdbc.date-time]
             [environ.core :refer [env]]))
 
 (def db-conf {:dbtype "postgres"
