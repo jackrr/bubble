@@ -2,6 +2,7 @@
   (:require [bubble.db.base :refer [db]]
             [bubble.login.code :as code]
             [bubble.login.session :as session]
+            [bubble.sms :as sms]
             [bubble.views :as views]
             [next.jdbc :as sql]
             [ring.util.response :refer [content-type redirect response]]))
@@ -56,11 +57,19 @@
       (let [user (find-or-create-user! {:phone phone})
             login-code (code/gen-code)]
         (code/store-code login-code (:users/id user))
-    ;; TODO: send SMS of URL w/ code to phone
-    ;; TODO: render page saying to check for text message w/ URL
-    ;; TODO: delete this link rendering as it is not a real auth test
+        (sms/send-message
+         {:to phone
+          :body (str
+                 "Click here to log in: "
+                 (-> req :scheme name)
+                 "://"
+                 (get-in req [:headers "host"])
+                 "/login-code/"
+                 login-code)})
+        ;; TODO: render page saying to check for text message w/ URL
+        ;; TODO: delete this link rendering as it is not a real auth test
         (views/base-view [[:a {:href (str "/login-code/" login-code)} "(TMP) Complete login"]]))
-      (login-error-redirect  "Invalid phone # provided"))))
+      (login-error-redirect "Invalid phone # provided"))))
 
 (comment
   (count nil)
