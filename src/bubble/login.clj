@@ -4,8 +4,16 @@
             [bubble.login.session :as session]
             [bubble.sms :as sms]
             [bubble.views :as views]
+            [dotenv :refer [env]]
             [next.jdbc :as sql]
             [ring.util.response :refer [content-type redirect response]]))
+
+(defn base-url [req]
+  (or (env "HOST")
+      (str
+       (-> req :scheme name)
+       "://"
+       (get-in req [:headers "host"]))))
 
 (defn login-error-redirect [error-message]
   (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
@@ -61,9 +69,7 @@
          {:to phone
           :body (str
                  "Click here to log in: "
-                 (-> req :scheme name)
-                 "://"
-                 (get-in req [:headers "host"])
+                 (base-url req)
                  "/login-code/"
                  login-code)})
         ;; TODO: render page saying to check for text message w/ URL
