@@ -9,6 +9,18 @@ You will need [Leiningen][] 2.0.0 or above installed.
 
 [leiningen]: https://github.com/technomancy/leiningen
 
+### Secrets
+
+There are a few secrets you'll need to get started. Create a .env file and add the following to it:
+
+DATABASE_URL=""
+HOST=""
+TWILIO_PHONE_NUMBER=""
+TWILIO_ACCOUNT_SID=""
+TWILIO_AUTH_TOKEN=""
+
+(Values must come from a maintainer of a live deployment, or you'll need to create your own)
+
 ### Docker + SQL
 
 To reduce the risk of cross-project conflicts, this project uses docker and docker-compose to isolate any database dependencies. You'll need both docker and docker-compose installed to run the app.
