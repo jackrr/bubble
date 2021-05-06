@@ -9,15 +9,15 @@
 (defn login-error-redirect [error-message]
   (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
 
-(defn auth-wall [req ok]
+(defn logged-in [req handler]
   (let [user (session/current-user req)]
+    (println req (:session req) user)
     (if user
-      ok
+      (handler (assoc req :current-user user))
       (login-error-redirect "You must be logged in to see that"))))
 
 (defn form-page [req]
-  (let [user (session/current-user req)
-        error (get-in req [:params :error])]
+  (let [error (get-in req [:params :error])]
     (views/base-view [[:h1 "Login"]
                       (when error [:p (str "Error: " error)])
                       [:form {:action "/login" :method "post"}
