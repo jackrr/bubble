@@ -63,7 +63,9 @@ CREATE TABLE public.login_codes (
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     expires_at timestamp without time zone DEFAULT now() NOT NULL,
     code text NOT NULL,
-    user_id uuid
+    user_id uuid,
+    short boolean,
+    short_code text
 );
 
 
@@ -208,4 +210,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20210422000610'),
     ('20210425160954'),
     ('20210503024315'),
-    ('20210503033824');
+    ('20210503033824'),
+    ('20210506044603');

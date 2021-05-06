@@ -11,15 +11,7 @@ You will need [Leiningen][] 2.0.0 or above installed.
 
 ### Secrets
 
-There are a few secrets you'll need to get started. Create a .env file and add the following to it:
-
-DATABASE_URL=""
-HOST=""
-TWILIO_PHONE_NUMBER=""
-TWILIO_ACCOUNT_SID=""
-TWILIO_AUTH_TOKEN=""
-
-(Values must come from a maintainer of a live deployment, or you'll need to create your own)
+There are a few secrets you'll need to get started. Create a .env file and add the necessary values to it. 
 
 ### Docker + SQL
 
