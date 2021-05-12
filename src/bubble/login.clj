@@ -41,7 +41,8 @@
     (login-error-redirect "Invalid or expired code. Please try again.")))
 
 (defn handle-short-code [{:keys [session params]}]
-  (login-response (code/user-id-for-code {:short_code (:code params)
+  (println params session "somthing")
+  (login-response (code/user-id-for-code {:short-code (:code params)
                                           :code (:login-nonce session)})))
 
 (defn handle-code [{{code :code} :params}]
@@ -86,9 +87,9 @@
           (-> (response
                ;; TODO: extract into own page for login to work
                (views/base-view [[:h1 "Enter your code"]
-                                 [:form {:action "/login-code" :method "post"}]
-                                 [:input {:name "code" :placeholder "Code from SMS..."}]
-                                 [:button {:name "submit"} "Login"]]))
+                                 [:form {:action "/login-code" :method "post"}
+                                  [:input {:name "code" :placeholder "Code from SMS..."}]
+                                  [:button {:name "submit"} "Login"]]]))
               (content-type "text/html")
               (assoc :session {:login-nonce (:login_codes/code login-code)}))
           (views/base-view [[:h1 "Please check your phone for your login link"]])))
