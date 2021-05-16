@@ -19,7 +19,7 @@
   (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
 
 (defn logged-in [req handler]
-  (let [user (session/current-user req)]
+  (let [user (session/current-user req {:extend true})]
     (if user
       (handler (assoc req :current-user user))
       (login-error-redirect "You must be logged in to see that"))))
@@ -37,11 +37,10 @@
 (defn login-response [user-id]
   (if user-id
     (-> (redirect "/")
-        (assoc :session {:session-id (session/create-session user-id)}))
+        (assoc :cookies (session/create-session-cookie user-id)))
     (login-error-redirect "Invalid or expired code. Please try again.")))
 
 (defn handle-short-code [{:keys [session params]}]
-  (println params session "somthing")
   (login-response (code/user-id-for-code {:short-code (:code params)
                                           :code (:login-nonce session)})))
 
@@ -82,10 +81,9 @@
                    (base-url req)
                    "/login-code/"
                    (:login_codes/code login-code)))})
-        (println login-code (:login_codes/short_code login-code))
         (if use-short-code?
           (-> (response
-               ;; TODO: extract into own page for login to work
+                 ;; TODO: extract into own page for login to work
                (views/base-view [[:h1 "Enter your code"]
                                  [:form {:action "/login-code" :method "post"}
                                   [:input {:name "code" :placeholder "Code from SMS..."}]

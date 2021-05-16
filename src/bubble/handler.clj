@@ -6,8 +6,8 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.logger :as logger]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [ring.middleware.session :refer [wrap-session]]))
+            [ring.middleware.cookies :refer [wrap-cookies]]
+            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
 (defroutes app-routes
   (GET "/" req (login/logged-in req bubbles/index-page))
@@ -22,4 +22,4 @@
   (-> app-routes
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))
       (logger/wrap-with-logger)
-      (wrap-session login.session/config)))
+      (wrap-cookies)))
