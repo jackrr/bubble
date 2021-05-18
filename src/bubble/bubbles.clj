@@ -18,11 +18,18 @@
         <p><a href='..'>Return to main page</p>
       </div>")))
 
-(defn bubble-names []
-  (sql/execute! db ["select name from bubbles"]))
+(defn bubble-info []
+  (sql/execute! db ["select name, id from bubbles"]))
+
+(defn bubble-page [req]
+  (let [{:keys [params uri]} req
+        param-id (get params :id)]
+    (println params param-id req)
+    (views/base-view
+     [[:h1 param-id]])))
 
 (defn index-page [req]
-  (println (bubble-names))
+  (println (bubble-info))
   (views/base-view
    [[:h1 "Hello World"]
     ;; TODO: hide login link once redirect built
@@ -30,7 +37,7 @@
     [:h2 (str "There are " (db/bubble-count) " bubbles in the database.")]
     [:ul
      (map (fn [bubble]
-            [:li (:bubbles/name bubble)]) (bubble-names))]
+            [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]]) (bubble-info))]
     [:form {:action "/newbubble" :method "post"}
      [:input {:placeholder "Name of Bubble" :name "bubblename"}]
      [:input {:placeholder "Email or Phone Number" :name "participantaddress"}]

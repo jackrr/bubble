@@ -15,6 +15,7 @@
   (GET "/login" req (login/form-page req))
   (POST "/login" req (login/handle-request req))
   (GET "/login-code/:code" req (login/handle-code req))
+  (GET "/bubble/:id" req (bubbles/bubble-page req))
   (POST "/login-code" req (login/handle-short-code req))
   (route/not-found "Not Found"))
 
