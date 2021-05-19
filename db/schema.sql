@@ -54,6 +54,19 @@ CREATE TABLE public.bubbles (
 
 
 --
+-- Name: bubbles_users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bubbles_users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    bubble_id uuid NOT NULL,
+    user_id uuid NOT NULL
+);
+
+
+--
 -- Name: login_codes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -113,6 +126,14 @@ ALTER TABLE ONLY public.bubbles
 
 
 --
+-- Name: bubbles_users bubbles_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bubbles_users
+    ADD CONSTRAINT bubbles_users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: login_codes login_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -153,6 +174,13 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: bubbles_users set_bubbles_users_timestamp; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_bubbles_users_timestamp BEFORE UPDATE ON public.bubbles_users FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
 -- Name: login_codes set_login_code_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -178,6 +206,22 @@ CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.bubbles FOR EACH ROW EXECUT
 --
 
 CREATE TRIGGER set_user_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
+-- Name: bubbles_users bubbles_users_bubble_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bubbles_users
+    ADD CONSTRAINT bubbles_users_bubble_id_fkey FOREIGN KEY (bubble_id) REFERENCES public.bubbles(id);
+
+
+--
+-- Name: bubbles_users bubbles_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bubbles_users
+    ADD CONSTRAINT bubbles_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -211,4 +255,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20210425160954'),
     ('20210503024315'),
     ('20210503033824'),
-    ('20210506044603');
+    ('20210506044603'),
+    ('20210518222755');
