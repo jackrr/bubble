@@ -61,3 +61,6 @@ lein ring server
 - TODO: Jack -- Welcome message w/ name of bubble on join
 - TODO: Jack -- Broadcast messages on inbound
 
+# General
+- Replace user namespace with member
+

@@ -5,6 +5,7 @@
             [ring.util.response :refer [redirect]]))
 
 (defn add-member [bubble-id user-id]
+  (println "HIT ADD-MEMBER")
   (sql/execute-one! db ["INSERT INTO bubbles_users (bubble_id, user_id) VALUES (?,?)" bubble-id user-id]))
 
 (defn bubble-info []
@@ -40,12 +41,16 @@
     (println (bubble-members param-id))
     (views/base-view
      [[:h1 (:bubbles/name bubble)]
+      [:h2 (str "Join bubble here: localhost:3000/bubble/" param-id "/join")]
       [:a {:href "/"} "Home"]
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture
               [:li (:users/phone user)])
-            (bubble-members param-id))]])))
+            (bubble-members param-id))]
+      [:form {:action param-id :method "post"}
+       [:input {:placeholder "Your phone" :name "userphone"}]
+       [:button () "join bubble"]]])))
 
 (defn index-page [req]
   (println (bubble-info))
