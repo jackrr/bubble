@@ -32,3 +32,35 @@ To start a web server for the application, run:
 ``` sh
 lein ring server
 ```
+
+## Roadmap
+
+### Pages
+
+- Home page
+  - DONE See own bubbles
+  - DONE Button to create a new bubble (link to new bubble page)
+  - DONE Redirect to login if not logged in
+  - Edit name form
+    - Name
+  - DONE New bubble form
+    - Bubble name
+- Bubble page
+  - DONE List all members
+  - DAVID -- Show add member (signup) link (to "Bubble join page")
+  - Unenroll
+  - (future) some kind of democratic management of membership (requires multi opt in to remove a member)
+- DONE Login form to capture phone
+- DAVID -- Bubble join page
+  - "You've been invited to join _name_, enter your phone..."
+  - Form for phone number and user name
+    - Submitting form adds user as member
+
+### Threading
+
+Jack:
+- Twilio phone number creation (ensure user has dedicated phone # for bubble membership)
+  - Only buy new number when cannot achieve above w/ current capacity
+- Welcome message w/ name of bubble on join
+- Broadcast messages on inbound
+
