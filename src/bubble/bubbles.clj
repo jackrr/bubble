@@ -2,10 +2,18 @@
   (:require [bubble.views :as views]
             [next.jdbc :as sql]
             [bubble.db :refer [db]]
+            [bubble.delivery :as delivery]
             [ring.util.response :refer [redirect]]))
 
 (defn add-member [bubble-id user-id]
-  (sql/execute-one! db ["INSERT INTO bubbles_users (bubble_id, user_id) VALUES (?,?)" bubble-id user-id]))
+  (sql/with-transaction [tx db]
+    (let [sender-id (delivery/assign-sender tx user-id)]
+      ;; TODO: send welcome message to user
+      (sql/execute-one!
+       tx
+       ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"
+        bubble-id user-id sender-id])))
+  (delivery/send-welcome-message bubble-id user-id))
 
 (defn optin [req]
   (let [id (get-in req [:params :id])]
@@ -45,14 +53,14 @@
 (defn bubble-count []
   (:count (sql/execute-one! db ["select count(*) from bubbles"])))
 
-(defn make-bubble [name]
+(defn create-bubble [name]
   (sql/execute-one! db ["INSERT INTO bubbles (name) VALUES (?)" name]
                     {:return-keys true}))
 
 (defn make-bubble [req]
   (let [{:keys [params current-user]} req
         bubble-name (get params :bubblename)
-        bubble (make-bubble bubble-name)]
+        bubble (create-bubble bubble-name)]
     (add-member (:bubbles/id bubble) (:users/id current-user))
     (redirect (str "bubble/" (:bubbles/id bubble)))))
 

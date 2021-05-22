@@ -1,0 +1,45 @@
+(ns bubble.delivery.sms
+  (:require [bubble.config :as config]
+            [clj-http.client :as client]
+            [dotenv :refer [env]]
+            [next.jdbc :as sql]))
+
+(def from-phone (env "TWILIO_PHONE_NUMBER"))
+(def auth-token (env "TWILIO_AUTH_TOKEN"))
+(def account-sid (env "TWILIO_ACCOUNT_SID"))
+(def api-base (str "https://api.twilio.com/2010-04-01/Accounts/" account-sid))
+(def incoming-sms-url (str config/base-url "/incoming-sms"))
+
+(defn- req-payload [opts]
+  (assoc opts :basic-auth [account-sid auth-token]))
+
+(defn- available-phone-number []
+  (->
+   (client/get (str api-base "/AvailablePhoneNumbers/US/Local.json")
+               (req-payload {:query-params {"PageSize" 1
+                                            "capabilities" {"sms" true
+                                                            "mms" true}}
+                             :as :json}))
+   (get-in [:body :available_phone_numbers])
+   first
+   :phone_number))
+
+(defn send-message [{:keys [to from body]}]
+  (client/post (str api-base "/Messages.json")
+               (req-payload {:form-params {:From (str "+" (or from from-phone))
+                                           :To (str "+" to)
+                                           :Body body}})))
+
+(defn acquire-number []
+  (let [phone-number (available-phone-number)]
+    (client/post (str api-base "/IncomingPhoneNumbers.json")
+                 (req-payload {:form-params {:PhoneNumber phone-number
+                                             :SmsUrl incoming-sms-url}}))
+    phone-number))
+
+(comment
+  (send-message {:to "" :body "Hello there!"})
+  account-sid
+
+  (-> env keys sort)
+  (env2/env "TWILIO_PHONE_NUMBER"))

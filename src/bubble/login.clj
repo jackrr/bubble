@@ -1,19 +1,13 @@
 (ns bubble.login
-  (:require [bubble.db :refer [db]]
+  (:require [bubble.config :as config]
+            [bubble.db :refer [db]]
+            [bubble.delivery.sms :as sms]
             [bubble.login.code :as code]
             [bubble.login.session :as session]
-            [bubble.sms :as sms]
             [bubble.views :as views]
             [dotenv :refer [env]]
             [next.jdbc :as sql]
             [ring.util.response :refer [content-type redirect response]]))
-
-(defn base-url [req]
-  (or (env "HOST")
-      (str
-       (-> req :scheme name)
-       "://"
-       (get-in req [:headers "host"]))))
 
 (defn login-error-redirect [error-message]
   (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
@@ -82,7 +76,7 @@
                   (str "Your bubble thread login code is: " (:login_codes/short_code login-code))
                   (str
                    "Click here to log in: "
-                   (base-url req)
+                   config/base-url
                    "/login-code/"
                    (:login_codes/code login-code)))})
         (if use-short-code?

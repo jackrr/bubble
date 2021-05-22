@@ -3,6 +3,7 @@
   :url "https://github.com/jackrr/bubble"
   :min-lein-version "2.0.0"
   :dependencies [[compojure "1.6.1"]
+                 [cheshire "5.10.0"]
                  [clj-http "3.12.0"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "2.2.2"]

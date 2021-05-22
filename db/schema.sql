@@ -62,7 +62,8 @@ CREATE TABLE public.bubbles_users (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     bubble_id uuid NOT NULL,
-    user_id uuid NOT NULL
+    user_id uuid NOT NULL,
+    sender_id uuid NOT NULL
 );
 
 
@@ -88,6 +89,18 @@ CREATE TABLE public.login_codes (
 
 CREATE TABLE public.schema_migrations (
     version character varying(255) NOT NULL
+);
+
+
+--
+-- Name: senders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.senders (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    phone text
 );
 
 
@@ -150,6 +163,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: senders senders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.senders
+    ADD CONSTRAINT senders_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -174,6 +195,20 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: bu_users_bubbles_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX bu_users_bubbles_idx ON public.bubbles_users USING btree (bubble_id, user_id);
+
+
+--
+-- Name: bu_users_senders_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX bu_users_senders_idx ON public.bubbles_users USING btree (user_id, sender_id);
+
+
+--
 -- Name: bubbles_users set_bubbles_users_timestamp; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -192,6 +227,13 @@ CREATE TRIGGER set_login_code_timestamp BEFORE UPDATE ON public.login_codes FOR 
 --
 
 CREATE TRIGGER set_session_timestamp BEFORE UPDATE ON public.sessions FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
+
+
+--
+-- Name: senders set_sms_numbers_timestamp; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_sms_numbers_timestamp BEFORE UPDATE ON public.senders FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
 --
@@ -214,6 +256,14 @@ CREATE TRIGGER set_user_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXE
 
 ALTER TABLE ONLY public.bubbles_users
     ADD CONSTRAINT bubbles_users_bubble_id_fkey FOREIGN KEY (bubble_id) REFERENCES public.bubbles(id);
+
+
+--
+-- Name: bubbles_users bubbles_users_sender_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bubbles_users
+    ADD CONSTRAINT bubbles_users_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.senders(id);
 
 
 --
@@ -256,4 +306,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20210503024315'),
     ('20210503033824'),
     ('20210506044603'),
-    ('20210518222755');
+    ('20210518222755'),
+    ('20210522203020');
