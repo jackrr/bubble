@@ -1,5 +1,5 @@
 (ns bubble.login
-  (:require [bubble.db.base :refer [db]]
+  (:require [bubble.db :refer [db]]
             [bubble.login.code :as code]
             [bubble.login.session :as session]
             [bubble.sms :as sms]
@@ -23,6 +23,10 @@
     (if user
       (handler (assoc req :current-user user))
       (login-error-redirect "You must be logged in to see that"))))
+
+(defn logout [req]
+  (session/log-out-user req)
+  (redirect "/login"))
 
 (defn form-page [req]
   (let [error (get-in req [:params :error])]

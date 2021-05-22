@@ -1,5 +1,5 @@
 (ns bubble.login.session
-  (:require [bubble.db.base :refer [db]]
+  (:require [bubble.db :refer [db]]
             [next.jdbc :as sql]
             [ring.middleware.session.cookie :as ring-cookie]))
 
@@ -43,6 +43,13 @@
      ["select * from sessions s left join users u on u.id = s.user_id where s.id = ?"
       session-id])))
 
+(defn log-out-user [req]
+  (when-let [session-id (session-id-from-req req)]
+    (sql/execute-one!
+     db
+     ["delete from sessions s where s.id = ?"
+      session-id])))
+
 (defn current-user
   ([req]
    (user-from-req req))
@@ -51,6 +58,7 @@
     (extend-session req)
     (user-from-req req))))
 
+;; TODO: encrypt this payload, ensure it actually expires
 (defn create-session-cookie [user-id]
   {SESSION_KEY {:value (create-session user-id)
                 :secure true

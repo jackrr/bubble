@@ -13,6 +13,7 @@
   (GET "/" req (login/logged-in req bubbles/index-page))
   (POST "/newbubble" req (login/logged-in req bubbles/make-bubble))
   (GET "/login" req (login/form-page req))
+  (POST "/logout" req (login/logged-in req login/logout))
   (POST "/login" req (login/handle-request req))
   (GET "/login-code/:code" req (login/handle-code req))
   (GET "/bubble/:id" req (bubbles/bubble-page req))

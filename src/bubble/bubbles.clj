@@ -1,7 +1,7 @@
 (ns bubble.bubbles
   (:require [bubble.views :as views]
             [next.jdbc :as sql]
-            [bubble.db.base :refer [db]]
+            [bubble.db :refer [db]]
             [ring.util.response :refer [redirect]]))
 
 (defn add-member [bubble-id user-id]
@@ -51,8 +51,8 @@
   (println (bubble-info))
   (views/base-view
    [[:h1 "Hello World"]
-    ;; TODO: hide login link once redirect built
-    [:a {:href "/login"} "Login"]
+    [:form {:action "/logout" :method "post"}
+     [:button "Log out"]]
     [:h2 (str "There are " (bubble-count) " bubbles in the database.")]
     ;; TODO: should only show bubbles i'm in
     [:ul

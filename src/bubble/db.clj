@@ -1,3 +1,12 @@
 (ns bubble.db
   (:require [next.jdbc :as sql]
-            [bubble.db.base :refer [db]]))
+            [next.jdbc.date-time]
+            [environ.core :refer [env]]))
+
+(def db-conf {:dbtype "postgres"
+              :dbname "bubble"
+              :user "bubble"
+              :password (env :db-password)
+              :port 5432})
+
+(def db (sql/get-datasource db-conf))

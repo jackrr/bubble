@@ -1,5 +1,5 @@
 (ns bubble.login.code
-  (:require [bubble.db.base :refer [db]]
+  (:require [bubble.db :refer [db]]
             [next.jdbc :as sql]
             [digest :refer [sha1]]))
 
