@@ -8,7 +8,6 @@
 (defn add-member [bubble-id user-id]
   (sql/with-transaction [tx db]
     (let [sender-id (delivery/assign-sender tx user-id)]
-      ;; TODO: send welcome message to user
       (sql/execute-one!
        tx
        ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"

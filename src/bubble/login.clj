@@ -73,7 +73,6 @@
                    (:login_codes/code login-code)))})
         (if use-short-code?
           (-> (response
-                 ;; TODO: extract into own page for login to work
                (views/base-view [[:h1 "Enter your code"]
                                  [:form {:action "/login-code" :method "post"}
                                   [:input {:name "code" :placeholder "Code from SMS..."}]

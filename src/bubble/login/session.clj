@@ -73,7 +73,6 @@
     (extend-session req)
     (user-from-req req))))
 
-;; TODO: encrypt this payload, ensure it actually expires
 (defn create-session-cookie [user-id]
   {SESSION_KEY {:value (create-session user-id)
                 :secure true
