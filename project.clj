@@ -7,6 +7,7 @@
                  [clj-http "3.12.0"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "2.2.2"]
+                 [org.clojure/data.xml "0.0.8"]
                  [digest "1.4.10"]
                  [lynxeyes/dotenv "1.1.0"]
                  [environ "1.2.0"]

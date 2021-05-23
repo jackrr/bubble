@@ -1,8 +1,10 @@
 (ns bubble.delivery.sms
   (:require [bubble.config :as config]
             [clj-http.client :as client]
+            [clojure.data.xml :as xml]
             [dotenv :refer [env]]
-            [next.jdbc :as sql]))
+            [next.jdbc :as sql]
+            [ring.util.response :refer [content-type response]]))
 
 (def from-phone (env "TWILIO_PHONE_NUMBER"))
 (def auth-token (env "TWILIO_AUTH_TOKEN"))
@@ -36,6 +38,20 @@
                  (req-payload {:form-params {:PhoneNumber phone-number
                                              :SmsUrl incoming-sms-url}}))
     phone-number))
+
+(defn- xml-response [xml-obj]
+  (-> xml-obj
+      xml/emit-str
+      response
+      (content-type "text/xml")))
+
+(defn empty-response []
+  (xml-response (xml/element :Response)))
+
+(defn message-response [msg]
+  (xml-response (xml/element :Response
+                             (xml/element :Message
+                                          (xml/element :Body {} msg)))))
 
 (comment
   (send-message {:to "" :body "Hello there!"})

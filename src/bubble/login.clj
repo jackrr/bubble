@@ -4,6 +4,7 @@
             [bubble.delivery.sms :as sms]
             [bubble.login.code :as code]
             [bubble.login.session :as session]
+            [bubble.phone :as phone]
             [bubble.views :as views]
             [dotenv :refer [env]]
             [next.jdbc :as sql]
@@ -51,20 +52,11 @@
       (or user
           (sql/execute-one! tx ["insert into users (phone) values (?)" phone] {:return-keys true})))))
 
-(defn parse-phone [st]
-  (let [match (re-find
-               (re-matcher
-                #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
-                st))
-        res (if (nil? match) nil (drop 1 match))]
-    (when res
-      (apply str (if (= "" (first res)) (into [1] res) res)))))
-
 (defn handle-request [req]
   (let [{:keys [params]} req
         phone (-> params
                   :phone
-                  parse-phone)
+                  phone/parse-phone)
         use-short-code? (boolean (:short-code params))]
     (if phone
       (let [login-code (code/create-code (:users/id
@@ -94,7 +86,7 @@
 (comment
   (count nil)
   (str ["1" "210" "863"])
-  (parse-phone "(210) 8632322")
+  (phone/parse-phone "(210) 8632322")
   (re-find
    (re-matcher
     #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"

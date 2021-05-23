@@ -1,6 +1,7 @@
 (ns bubble.delivery
   (:require [bubble.db :refer [db]]
             [bubble.delivery.sms :as sms]
+            [bubble.phone :as phone]
             [dotenv :refer [env]]
             [next.jdbc :as sql]))
 
@@ -17,15 +18,6 @@
 
 (defn assign-sender [tx user-id]
   ;; Only does phone # methods for now
-  (println (sql/execute-one!
-            tx
-            [(str
-              "select id from senders where id not in "
-              "(select bu.sender_id from bubbles_users bu "
-              "join senders s on bu.sender_id = s.id "
-              "where bu.user_id = ?) "
-              "limit 1")
-             user-id]))
   (or (some-> (sql/execute-one!
                tx
                [(str
@@ -56,8 +48,37 @@
                                   " Simply reply to send a message to everyone.")})))
 
 (defn handle-inbound-sms [req]
-;; TODO: add incoming handler
-;; map to user/bubble
-;; broadcast on bubble w/ prefix of who sent (do not send to sender)
-;; if no user/bubble found -- send a default response
-  )
+  (let [params (:params req)
+        sender-phone (phone/parse-phone (:To params))
+        user-phone (phone/parse-phone (:From params))
+        msg (:Body params)
+        data (sql/execute-one!
+              db
+              [(str "select u.id,u.phone,bu.bubble_id "
+                    "from users u "
+                    "join bubbles_users bu on bu.user_id = u.id "
+                    "join senders s on bu.sender_id = s.id "
+                    "where u.phone = ? and s.phone = ?")
+               user-phone sender-phone])]
+    (if data
+      (do
+        (let [recipients (sql/execute!
+                          db
+                          [(str "select u.phone,s.phone "
+                                "from users u "
+                                "join bubbles_users bu on bu.user_id = u.id "
+                                "join senders s on bu.sender_id = s.id "
+                                "where u.id != ? and bu.bubble_id = ?")
+                           (:users/id data) (:bubbles_users/bubble_id data)])]
+          (doall
+           (map (fn [bubble-user-sender]
+                  (println "IN MAP")
+                  (println bubble-user-sender)
+                  (sms/send-message {:to (:users/phone bubble-user-sender)
+                                     :from (:senders/phone bubble-user-sender)
+                                     ;; TODO: send username once we have available
+                                     :body (str msg " - From " (:users/phone data))}))
+                recipients))
+          (sms/empty-response)))
+      (sms/message-response
+       "We're sorry, we don't recognize you. Please sign in and check your bubble memberships."))))
