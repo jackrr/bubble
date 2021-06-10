@@ -28,7 +28,7 @@ docker-compose up -d postgres
 ```
 
 To start a web server for the application, run:
-
+  
 ``` sh
 lein ring server
 ```
@@ -47,9 +47,11 @@ lein ring server
   - TODO: DAVID -- Show add member (signup) link (to "Bubble join page")
   - TODO Unenroll
   - DONE List all members
+  - DONE -- Show add member (signup) link (to "Bubble join page")
+  - Unenroll
   - (future) some kind of democratic management of membership (requires multi opt in to remove a member)
 - DONE Login form to capture phone
-- TODO: DAVID -- Bubble join page
+- DONE -- Bubble join page
   - "You've been invited to join _name_, enter your phone..."
   - Form for phone number and user name
     - Submitting form adds user as member
@@ -63,4 +65,10 @@ lein ring server
 
 # General
 - Replace user namespace with member
+- Prevent duplicate membership to bubbles
+- Edit name form
+  - Name
+
+# David To Do
+-Deal with PR comments
 
