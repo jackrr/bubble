@@ -8,6 +8,38 @@
   (println "HIT ADD-MEMBER")
   (sql/execute-one! db ["INSERT INTO bubbles_users (bubble_id, user_id) VALUES (?,?)" bubble-id user-id]))
 
+(defn optin [req]
+  (println "optin test")
+  (let [id (get-in req [:params :id])]
+    (println id)
+    (let [current-user-id (get-in req [:current-user :users/id])] 
+        (println  current-user-id)
+        (println req)
+        (add-member (java.util.UUID/fromString id) current-user-id)
+        (redirect (str "/bubble/" id))))
+  )
+  
+
+(defn fetch-bubble-name [id]
+  (sql/execute-one! db ["select name from bubbles where id = ?" (java.util.UUID/fromString id)]))
+
+
+(defn count-bubble-members [bubble-id]
+  (sql/execute-one!
+   db
+   ["select count(users) from bubbles_users bu join users on bu.user_id = users.id where bu.bubble_id = ?"
+    (java.util.UUID/fromString bubble-id)]))
+
+
+(defn join-bubble-form [req]
+  (let [id (get-in req [:params :id])]
+    (println (count-bubble-members id))
+    (views/base-view [[:h1 "Login to join bubble " (get-in (fetch-bubble-name id) [:bubbles/name])]
+                        [:p "There are this many people in the bubble: " (get-in (count-bubble-members id) [:count])]
+                        [:p "You can join this bubble here"]
+                        [:a {:href (str "/bubble/" id "/optin")}
+                          [:button {:name "submit"} "Join bubble"]]])))
+
 (defn bubble-info []
   (sql/execute! db ["select name, id from bubbles"]))
 
@@ -42,7 +74,9 @@
     (views/base-view
      [[:h1 (:bubbles/name bubble)]
       [:h2 (str "Join bubble here: localhost:3000/bubble/" param-id "/join")]
-      [:a {:href "/"} "Home"]
+      (let [join-link (str "http://localhost:3000/bubble/" param-id "/join")]
+        [:a {:href (str "sms:?&=" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} (str "Bubble join link: " join-link)])
+        [:a {:href "/"} "Home"]
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture

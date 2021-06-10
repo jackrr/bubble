@@ -28,18 +28,6 @@
   (session/log-out-user req)
   (redirect "/login"))
 
-(defn join-bubble-form [req]
-  (let [uri (get-in req [:uri])]
-    (println (str "HEEEEEERRRRR: " uri)))
-  (let [error (get-in req [:params :error])]
-    (views/base-view [[:h1 "Login to join bubble"]
-                      (when error [:p (str "Error: " error)])
-                      [:form {:action "/login" :method "post"}
-                       [:input {:name "phone" :placeholder "Phone #"}]
-                       [:input {:name "short-code" :type "checkbox"}]
-                       [:label {:for "short-code"} "Send a code instead"]
-                       [:button {:name "submit"} "Send me a link"]]])))
-
 (defn join-bubble [req])
 
 (defn form-page [req]
