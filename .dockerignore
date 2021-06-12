@@ -1,0 +1,11 @@
+bin
+db
+deploy.sh
+doc
+_local_db
+src
+test
+
+.env
+.git
+.lein-env

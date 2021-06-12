@@ -18,6 +18,7 @@
                  [org.clojure/tools.logging "0.3.1"]]
   :plugins [[lein-environ "1.2.0"]
             [lein-ring "0.12.5"]]
+  :uberjar-name "bubble.jar"
   :ring {:handler bubble.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
