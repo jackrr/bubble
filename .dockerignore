@@ -1,5 +1,3 @@
-bin
-db
 deploy.sh
 doc
 _local_db
