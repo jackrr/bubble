@@ -1,4 +1,5 @@
 .env
+*.env
 /target
 /lib
 /classes
@@ -10,3 +11,4 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /_local_db
+k8s/
