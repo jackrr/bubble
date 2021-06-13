@@ -28,8 +28,6 @@
   (session/log-out-user req)
   (redirect "/login"))
 
-(defn join-bubble [req])
-
 (defn form-page [req]
   (let [error (get-in req [:params :error])]
     (views/base-view [[:h1 "Login"]

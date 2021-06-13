@@ -80,11 +80,8 @@
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture
-              [:li (:users/phone user)])
-            (bubble-members param-id))]
-      [:form {:action param-id :method "post"}
-       [:input {:placeholder "Your phone" :name "userphone"}]
-       [:button () "join bubble"]]])))
+            [:li (:users/phone user)])
+            (bubble-members param-id))]])))
 
 (defn index-page [req]
   (println (bubble-info))
