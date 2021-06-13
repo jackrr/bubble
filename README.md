@@ -61,3 +61,7 @@ lein ring server
 - TODO: Jack -- Welcome message w/ name of bubble on join
 - TODO: Jack -- Broadcast messages on inbound
 
+
+### Names
+- TODO: David to add name to find-or-add user ? Maybe also db migration
+

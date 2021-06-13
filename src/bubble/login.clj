@@ -33,6 +33,7 @@
     (views/base-view [[:h1 "Login"]
                       (when error [:p (str "Error: " error)])
                       [:form {:action "/login" :method "post"}
+                       [:input {:name "member-name" :placeholder "Name"}]
                        [:input {:name "phone" :placeholder "Phone #"}]
                        [:input {:name "short-code" :type "checkbox"}]
                        [:label {:for "short-code"} "Send a code instead"]
