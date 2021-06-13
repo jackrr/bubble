@@ -29,7 +29,7 @@
   (redirect "/login"))
 
 (defn form-page [req]
-  (let [error (get-in req [:params :error])]
+    (let [error (get-in req [:params :error])]
     (views/base-view [[:h1 "Login"]
                       (when error [:p (str "Error: " error)])
                       [:form {:action "/login" :method "post"}
