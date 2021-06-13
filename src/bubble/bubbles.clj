@@ -1,6 +1,7 @@
 (ns bubble.bubbles
   (:require [bubble.views :as views]
             [next.jdbc :as sql]
+            [bubble.config :refer [base-url]]
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
             [ring.util.response :refer [redirect]]))
@@ -70,10 +71,13 @@
     (println (bubble-members param-id))
     (views/base-view
      [[:h1 (:bubbles/name bubble)]
-      [:h2 (str "Join bubble here: localhost:3000/bubble/" param-id "/join")]
-      (let [join-link (str "http://localhost:3000/bubble/" param-id "/join")]
-        [:a {:href (str "sms:?&=" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} (str "Bubble join link: " join-link)])
-      [:a {:href "/"} "Home"]
+      (into [:p "To invite new members share the following link: "]
+            (let [join-link (str base-url "/" param-id "/join")]
+              [[:a {:href join-link} join-link]
+               " or "
+               [:a {:href (str "sms:?&=" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
+      [:div
+       [:a {:href "/"} "Back to home"]]
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture
