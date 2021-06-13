@@ -70,5 +70,5 @@ lein ring server
   - Name
 
 # David To Do
--Deal with PR comments
+-DONE Deal with PR comments
 
