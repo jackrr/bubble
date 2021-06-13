@@ -1,19 +1,14 @@
 (ns bubble.login
-  (:require [bubble.db :refer [db]]
+  (:require [bubble.config :as config]
+            [bubble.db :refer [db]]
+            [bubble.delivery.sms :as sms]
             [bubble.login.code :as code]
             [bubble.login.session :as session]
-            [bubble.sms :as sms]
+            [bubble.phone :as phone]
             [bubble.views :as views]
             [dotenv :refer [env]]
             [next.jdbc :as sql]
             [ring.util.response :refer [content-type redirect response]]))
-
-(defn base-url [req]
-  (or (env "HOST")
-      (str
-       (-> req :scheme name)
-       "://"
-       (get-in req [:headers "host"]))))
 
 (defn login-error-redirect [error-message]
   (redirect (str "/login?" (ring.util.codec/form-encode {:error error-message}))))
@@ -57,20 +52,11 @@
       (or user
           (sql/execute-one! tx ["insert into users (phone) values (?)" phone] {:return-keys true})))))
 
-(defn parse-phone [st]
-  (let [match (re-find
-               (re-matcher
-                #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"
-                st))
-        res (if (nil? match) nil (drop 1 match))]
-    (when res
-      (apply str (if (= "" (first res)) (into [1] res) res)))))
-
 (defn handle-request [req]
   (let [{:keys [params]} req
         phone (-> params
                   :phone
-                  parse-phone)
+                  phone/parse-phone)
         use-short-code? (boolean (:short-code params))]
     (if phone
       (let [login-code (code/create-code (:users/id
@@ -82,12 +68,11 @@
                   (str "Your bubble thread login code is: " (:login_codes/short_code login-code))
                   (str
                    "Click here to log in: "
-                   (base-url req)
+                   config/base-url
                    "/login-code/"
                    (:login_codes/code login-code)))})
         (if use-short-code?
           (-> (response
-                 ;; TODO: extract into own page for login to work
                (views/base-view [[:h1 "Enter your code"]
                                  [:form {:action "/login-code" :method "post"}
                                   [:input {:name "code" :placeholder "Code from SMS..."}]
@@ -100,7 +85,7 @@
 (comment
   (count nil)
   (str ["1" "210" "863"])
-  (parse-phone "(210) 8632322")
+  (phone/parse-phone "(210) 8632322")
   (re-find
    (re-matcher
     #"^\+?\s*(\d*)\-?\s*\(?\s*(\d{3})\-?\s*\)?\s*(\d{3})\-?\s*(\d{4})\s*$"

@@ -58,10 +58,10 @@ lein ring server
 
 ### Threading
 
-- TODO: Jack -- Twilio phone number creation (ensure user has dedicated phone # for bubble membership)
+- DONE -- Twilio phone number creation (ensure user has dedicated phone # for bubble membership)
   - Only buy new number when cannot achieve above w/ current capacity
-- TODO: Jack -- Welcome message w/ name of bubble on join
-- TODO: Jack -- Broadcast messages on inbound
+- DONE -- Welcome message w/ name of bubble on join
+- DONE -- Broadcast messages on inbound
 
 # General
 - Replace user namespace with member
