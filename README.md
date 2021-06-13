@@ -41,3 +41,6 @@ lein ring server
   - Unenrollment form/link
 - Edit name form on homepage
 - Prevent duplicate enrollment
+
+### Names
+- TODO: David to add name to find-or-add user ? Maybe also db migration
