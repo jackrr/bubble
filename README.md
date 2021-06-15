@@ -43,4 +43,4 @@ lein ring server
 - Prevent duplicate enrollment
 
 ### Names
-- TODO: David to add name to find-or-add user ? Maybe also db migration
+- Show name on bubble page

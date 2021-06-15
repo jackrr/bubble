@@ -81,7 +81,7 @@
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture
-              [:li (:users/phone user)])
+              [:li (:users/phone user) " " (:users/name user)])
             (bubble-members param-id))]])))
 
 (defn index-page [req]

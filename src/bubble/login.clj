@@ -47,21 +47,24 @@
 (defn handle-code [{{code :code} :params}]
   (login-response (code/user-id-for-code {:code code})))
 
-(defn find-or-create-user! [{:keys [phone]}]
+(defn find-or-create-user! [{:keys [phone name]}]
   (sql/with-transaction [tx db]
     (let [user (sql/execute-one! tx ["select * from users where phone = ?" phone])]
       (or user
-          (sql/execute-one! tx ["insert into users (phone) values (?)" phone] {:return-keys true})))))
+          (println "TESTTTTT " name)
+          (sql/execute-one! tx ["insert into users (phone, name) values (?,?)" phone name] {:return-keys true})))))
 
 (defn handle-request [req]
   (let [{:keys [params]} req
+        name (-> params :member-name)
         phone (-> params
                   :phone
                   phone/parse-phone)
         use-short-code? (boolean (:short-code params))]
+    (println "test in handle-request name: " name params)
     (if phone
       (let [login-code (code/create-code (:users/id
-                                          (find-or-create-user! {:phone phone}))
+                                          (find-or-create-user! {:phone phone :name name}))
                                          use-short-code?)]
         (sms/send-message
          {:to phone
