@@ -41,6 +41,3 @@ lein ring server
   - Unenrollment form/link
 - Edit name form on homepage
 - Prevent duplicate enrollment
-
-### Names
-- Show name on bubble page
