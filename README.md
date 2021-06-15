@@ -40,4 +40,5 @@ lein ring server
   - List members
   - Unenrollment form/link
 - Edit name form on homepage
-- Prevent duplicate enrollment
+- Twilio webhook auth
+- Only show bubbles I'm in on homepage
