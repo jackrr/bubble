@@ -51,7 +51,6 @@
   (sql/with-transaction [tx db]
     (let [user (sql/execute-one! tx ["select * from users where phone = ?" phone])]
       (or user
-          (println "TESTTTTT " name)
           (sql/execute-one! tx ["insert into users (phone, name) values (?,?)" phone name] {:return-keys true})))))
 
 (defn handle-request [req]
@@ -61,7 +60,6 @@
                   :phone
                   phone/parse-phone)
         use-short-code? (boolean (:short-code params))]
-    (println "test in handle-request name: " name params)
     (if phone
       (let [login-code (code/create-code (:users/id
                                           (find-or-create-user! {:phone phone :name name}))

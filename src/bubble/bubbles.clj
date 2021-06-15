@@ -68,7 +68,6 @@
   (let [{:keys [params uri]} req
         param-id (get params :id)
         bubble (fetch-bubble param-id)]
-    (println (bubble-members param-id))
     (views/base-view
      [[:h1 (:bubbles/name bubble)]
       (into [:p "To invite new members share the following link: "]
