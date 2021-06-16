@@ -68,7 +68,6 @@
   (let [{:keys [params uri]} req
         param-id (get params :id)
         bubble (fetch-bubble param-id)]
-    (println (bubble-members param-id))
     (views/base-view
      [[:h1 (:bubbles/name bubble)]
       (into [:p "To invite new members share the following link: "]
@@ -81,7 +80,7 @@
       [:ul
        (map (fn [user]
     ;; TODO: show names members once we have name capture
-              [:li (:users/phone user)])
+              [:li (:users/phone user) " " (:users/name user)])
             (bubble-members param-id))]])))
 
 (defn index-page [req]
