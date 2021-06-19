@@ -1,10 +1,15 @@
 (ns bubble.delivery.sms
+  (:import [com.twilio.security RequestValidator])
   (:require [bubble.config :as config]
+            [bubble.db :refer [db]]
+            [bubble.phone :as phone]
             [clj-http.client :as client]
             [clojure.data.xml :as xml]
+            [clojure.walk :refer [stringify-keys]]
             [dotenv :refer [env]]
             [next.jdbc :as sql]
-            [ring.util.response :refer [content-type response]]))
+            [ring.util.request :refer [request-url]]
+            [ring.util.response :refer [content-type get-header response status]]))
 
 (def from-phone (env "TWILIO_PHONE_NUMBER"))
 (def auth-token (env "TWILIO_AUTH_TOKEN"))
@@ -52,6 +57,46 @@
   (xml-response (xml/element :Response
                              (xml/element :Message
                                           (xml/element :Body {} msg)))))
+
+(defn handle-inbound-sms [req]
+  (let [params (:params req)]
+    (if (not (.validate
+              (new RequestValidator auth-token)
+              (request-url req)
+              (stringify-keys params)
+              (get-header req  "X-Twilio-Signature")))
+      (status (response "Invalid signature") 400)
+      (let [sender-phone (phone/parse-phone (:To params))
+            user-phone (phone/parse-phone (:From params))
+            msg (:Body params)
+            data (sql/execute-one!
+                  db
+                  [(str "select u.id,u.phone,bu.bubble_id "
+                        "from users u "
+                        "join bubbles_users bu on bu.user_id = u.id "
+                        "join senders s on bu.sender_id = s.id "
+                        "where u.phone = ? and s.phone = ?")
+                   user-phone sender-phone])]
+        (if data
+          (do
+            (let [recipients (sql/execute!
+                              db
+                              [(str "select u.phone,s.phone "
+                                    "from users u "
+                                    "join bubbles_users bu on bu.user_id = u.id "
+                                    "join senders s on bu.sender_id = s.id "
+                                    "where u.id != ? and bu.bubble_id = ?")
+                               (:users/id data) (:bubbles_users/bubble_id data)])]
+              (doall
+               (map (fn [bubble-user-sender]
+                      (send-message {:to (:users/phone bubble-user-sender)
+                                     :from (:senders/phone bubble-user-sender)
+                                     :body (str msg " - From " (or (:users/name data)
+                                                                   (:users/phone data)))}))
+                    recipients))
+              (empty-response)))
+          (message-response
+           "We're sorry, we don't recognize you. Please sign in and check your bubble memberships."))))))
 
 (comment
   (send-message {:to "" :body "Hello there!"})
