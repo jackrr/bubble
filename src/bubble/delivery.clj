@@ -48,6 +48,7 @@
                                   " Simply reply to send a message to everyone.")})))
 
 (defn handle-inbound-sms [req]
+  ;; TODO: Add authenticity verification for twilio requests
   (let [params (:params req)
         sender-phone (phone/parse-phone (:To params))
         user-phone (phone/parse-phone (:From params))
@@ -76,8 +77,8 @@
                   (println bubble-user-sender)
                   (sms/send-message {:to (:users/phone bubble-user-sender)
                                      :from (:senders/phone bubble-user-sender)
-                                     ;; TODO: send username once we have available
-                                     :body (str msg " - From " (:users/phone data))}))
+                                     :body (str msg " - From " (or (:users/name data)
+                                                                   (:users/phone data)))}))
                 recipients))
           (sms/empty-response)))
       (sms/message-response

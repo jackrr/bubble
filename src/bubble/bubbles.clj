@@ -6,6 +6,23 @@
             [bubble.delivery :as delivery]
             [ring.util.response :refer [redirect]]))
 
+(defn at-max-enrollments? [user-id]
+  (< 9 (:count
+        (sql/execute-one!
+         db
+         ["SELECT count(*) from bubbles_users where user_id = ?" user-id]))))
+
+(defn enrolled? [bubble-id user-id]
+  (= 1 (:count
+        (sql/execute-one!
+         db
+         ["SELECT count(*) from bubbles_users where user_id = ? AND bubble_id = ?" user-id bubble-id]))))
+
+(defn enrollment-error [bubble-id user-id]
+  (cond
+    (enrolled? bubble-id user-id) "Already enrolled in bubble"
+    (at-max-enrollments? user-id) "Bubble membership capacity reached"))
+
 (defn add-member [bubble-id user-id]
   (sql/with-transaction [tx db]
     (let [sender-id (delivery/assign-sender tx user-id)]
@@ -15,11 +32,18 @@
         bubble-id user-id sender-id])))
   (delivery/send-welcome-message bubble-id user-id))
 
+(defn redirect-home-with-error [msg]
+  (redirect (str "/?" (ring.util.codec/form-encode
+                       {:error msg}))))
+
 (defn optin [req]
-  (let [id (get-in req [:params :id])]
-    (let [current-user-id (get-in req [:current-user :users/id])]
-      (add-member (java.util.UUID/fromString id) current-user-id)
-      (redirect (str "/bubble/" id)))))
+  (let [id (get-in req [:params :id])
+        user-id (get-in req [:current-user :users/id])]
+    (if-let [enrollment-error (enrollment-error (java.util.UUID/fromString id) user-id)]
+      (redirect-home-with-error enrollment-error)
+      (do
+        (add-member (java.util.UUID/fromString id) user-id)
+        (redirect (str "/bubble/" id))))))
 
 (defn fetch-bubble-name [id]
   (sql/execute-one! db ["select name from bubbles where id = ?" (java.util.UUID/fromString id)]))
@@ -61,8 +85,13 @@
   (let [{:keys [params current-user]} req
         bubble-name (get params :bubblename)
         bubble (create-bubble bubble-name)]
-    (add-member (:bubbles/id bubble) (:users/id current-user))
-    (redirect (str "bubble/" (:bubbles/id bubble)))))
+    (let [user-id (:users/id current-user)
+          bubble-id (:bubbles/id bubble)]
+      (if-let [enrollment-error (enrollment-error bubble-id  user-id)]
+        (redirect-home-with-error enrollment-error)
+        (do
+          (add-member (:bubbles/id bubble) user-id)
+          (redirect (str "bubble/" bubble-id)))))))
 
 (defn bubble-page [req]
   (let [{:keys [params uri]} req
@@ -84,11 +113,10 @@
             (bubble-members param-id))]])))
 
 (defn index-page [req]
-  (println (bubble-info))
   (views/base-view
-   [[:h1 "Hello World"]
-    [:form {:action "/logout" :method "post"}
-     [:button "Log out"]]
+   [[:h1 "Bubble Thread"]
+    (when-let [error (get-in req [:params :error])]
+      [:h2 (str "Error: " error)])
     [:h2 (str "There are " (bubble-count) " bubbles in the database.")]
     ;; TODO: should only show bubbles i'm in
     [:ul
@@ -97,4 +125,5 @@
     [:form {:action "/newbubble" :method "post"}
      [:input {:placeholder "Name of Bubble" :name "bubblename"}]
      [:button () "blow bubble"]]
-    [:h3 "test"]]))
+    [:form {:action "/logout" :method "post"}
+     [:button "Log out"]]]))
