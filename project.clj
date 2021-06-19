@@ -17,7 +17,8 @@
                  [org.postgresql/postgresql "42.2.19.jre7"]
                  [ring/ring-defaults "0.3.2"]
                  [ring-logger "1.0.1"]
-                 [org.clojure/tools.logging "0.3.1"]]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [com.twilio.sdk/twilio "8.15.0"]]
   :plugins [[lein-environ "1.2.0"]
             [lein-ring "0.12.5"]]
   :uberjar-name "bubble.jar"

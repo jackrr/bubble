@@ -1,7 +1,6 @@
 (ns bubble.delivery
   (:require [bubble.db :refer [db]]
             [bubble.delivery.sms :as sms]
-            [bubble.phone :as phone]
             [dotenv :refer [env]]
             [next.jdbc :as sql]))
 
@@ -46,40 +45,3 @@
                        :body (str "You have successfully joined bubble " (:bubbles/name data)
                                   ". It has " member-count " members."
                                   " Simply reply to send a message to everyone.")})))
-
-(defn handle-inbound-sms [req]
-  ;; TODO: Add authenticity verification for twilio requests
-  (let [params (:params req)
-        sender-phone (phone/parse-phone (:To params))
-        user-phone (phone/parse-phone (:From params))
-        msg (:Body params)
-        data (sql/execute-one!
-              db
-              [(str "select u.id,u.phone,bu.bubble_id "
-                    "from users u "
-                    "join bubbles_users bu on bu.user_id = u.id "
-                    "join senders s on bu.sender_id = s.id "
-                    "where u.phone = ? and s.phone = ?")
-               user-phone sender-phone])]
-    (if data
-      (do
-        (let [recipients (sql/execute!
-                          db
-                          [(str "select u.phone,s.phone "
-                                "from users u "
-                                "join bubbles_users bu on bu.user_id = u.id "
-                                "join senders s on bu.sender_id = s.id "
-                                "where u.id != ? and bu.bubble_id = ?")
-                           (:users/id data) (:bubbles_users/bubble_id data)])]
-          (doall
-           (map (fn [bubble-user-sender]
-                  (println "IN MAP")
-                  (println bubble-user-sender)
-                  (sms/send-message {:to (:users/phone bubble-user-sender)
-                                     :from (:senders/phone bubble-user-sender)
-                                     :body (str msg " - From " (or (:users/name data)
-                                                                   (:users/phone data)))}))
-                recipients))
-          (sms/empty-response)))
-      (sms/message-response
-       "We're sorry, we don't recognize you. Please sign in and check your bubble memberships."))))

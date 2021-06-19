@@ -1,6 +1,7 @@
 (ns bubble.handler
   (:require [bubble.bubbles :as bubbles]
             [bubble.delivery :as delivery]
+            [bubble.delivery.sms :as delivery.sms]
             [bubble.login :as login]
             [bubble.login.session :as login.session]
             [bubble.views :as views]
@@ -20,7 +21,7 @@
   (GET "/bubble/:id/optin" req (login/logged-in req bubbles/optin))
 
   ;; thread management
-  (POST "/incoming-sms" req (delivery/handle-inbound-sms req))
+  (POST "/incoming-sms" req (delivery.sms/handle-inbound-sms req))
 
   ;; login stuff
   (GET "/login" req (login/form-page req))
