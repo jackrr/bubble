@@ -42,3 +42,6 @@ lein ring server
 - Edit name form on homepage
 - Twilio webhook auth
 - Only show bubbles I'm in on homepage
+- Login page UI
+- Bubble page UI 
+- Home page UI 
