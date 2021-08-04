@@ -5,7 +5,7 @@
             [next.jdbc :as sql]))
 
 ;; Do not buy extra phone #s by default
-(def BUY_SMS_METHODS (boolean (env "BUY_SMS_METHODS")))
+(def BUY_SMS_METHODS (= (env "BUY_SMS_METHODS") "true"))
 
 (defn- acquire-sender [tx]
   (let [phone (if BUY_SMS_METHODS
