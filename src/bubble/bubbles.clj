@@ -120,7 +120,6 @@
 
 (defn index-page [req]
   (let [user-id (get-in req [:current-user :users/id])]
-    (println "tttttteeeeeeesssst " + user-id)
   (views/base-view
    [[:h1 "Bubble Thread"]
     (when-let [error (get-in req [:params :error])]
