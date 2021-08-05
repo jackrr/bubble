@@ -109,7 +109,7 @@
             (let [join-link (str base-url "/bubble/" param-id "/join")]
               [[:a {:href join-link} join-link]
                " or "
-               [:a {:href (str "sms:?&=" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
+               [:a {:href (str "sms:?&" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
       [:div
        [:a {:href "/"} "Back to home"]]
       [:ul
