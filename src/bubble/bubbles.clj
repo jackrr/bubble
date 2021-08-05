@@ -65,6 +65,9 @@
 (defn bubble-info []
   (sql/execute! db ["select name, id from bubbles"]))
 
+(defn my-bubble-info [user-id]
+  (sql/execute! db ["select bubbles.name, bubbles.id from bubbles join bubbles_users bu on bu.bubble_id = bubbles.id where bu.user_id = ?" user-id]))
+
 (defn fetch-bubble [id]
   (sql/execute-one! db ["select * from bubbles where id = ?" (java.util.UUID/fromString id)]))
 
@@ -76,6 +79,9 @@
 
 (defn bubble-count []
   (:count (sql/execute-one! db ["select count(*) from bubbles"])))
+
+(defn my-bubble-count [user-id]
+  (:count (sql/execute-one! db ["select count(*) from bubbles_users where user_id = ?" user-id])))
 
 (defn create-bubble [name]
   (sql/execute-one! db ["INSERT INTO bubbles (name) VALUES (?)" name]
@@ -113,17 +119,21 @@
             (bubble-members param-id))]])))
 
 (defn index-page [req]
+  (let [user-id (get-in req [:current-user :users/id])]
   (views/base-view
    [[:h1 "Bubble Thread"]
     (when-let [error (get-in req [:params :error])]
       [:h2 (str "Error: " error)])
-    [:h2 (str "There are " (bubble-count) " bubbles in the database.")]
+    [:h2 (str "You are enrolled in " (my-bubble-count user-id) " bubbles.")]
+    [:h3 (str "To blow a bubble, add a bubble name below. Then invite other people to enroll in that bubble.")]
     ;; TODO: should only show bubbles i'm in
     [:ul
      (map (fn [bubble]
-            [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]]) (bubble-info))]
+            [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]]) (my-bubble-info user-id))]
     [:form {:action "/newbubble" :method "post"}
      [:input {:placeholder "Name of Bubble" :name "bubblename"}]
+     [:span (str "   ")]
      [:button () "blow bubble"]]
-    [:form {:action "/logout" :method "post"}
-     [:button "Log out"]]]))
+     [:p]
+     [:form {:action "/logout" :method "post"}
+     [:button "Log out"]]])))
