@@ -35,7 +35,7 @@
                       [:p]
                       (when error [:p (str "Error: " error)])
                       [:form {:action "/login" :method "post"}
-                       [:input {:name "member-name" :placeholder "username"}]
+                       [:input {:name "username" :placeholder "username"}]
                        [:p]
                        [:input {:name "phone" :placeholder "phone number"}]
                        [:p]
@@ -65,7 +65,7 @@
 
 (defn handle-request [req]
   (let [{:keys [params]} req
-        name (-> params :member-name)
+        name (:username params)
         phone (-> params
                   :phone
                   phone/parse-phone)
