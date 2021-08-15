@@ -18,7 +18,7 @@
       sha1))
 
 (defn delete-expired-codes! []
-  (sql/execute! db ["delete from sessions where expires_at < ?" (java.util.Date.)]))
+  (sql/execute! db ["delete from login_codes where expires_at < ?" (java.util.Date.)]))
 
 (defn create-code [user-id short]
   (first (sql/execute! db ["insert into login_codes (code, short_code, short, user_id, expires_at) values (?,?,?,?,?)"
