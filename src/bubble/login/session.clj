@@ -48,8 +48,7 @@
      db
      ["update sessions set expires_at = ? where id = ?"
       (expire-at)
-      (session-id-from-req req)])
-    true))
+      session-id])))
 
 (defn- user-from-req [req]
   (when-let [session-id (session-id-from-req req)]
@@ -69,13 +68,14 @@
   ([req]
    (user-from-req req))
   ([req {:keys [extend]}]
-   (and
-    (extend-session req)
-    (user-from-req req))))
+   (do
+     (extend-session req)
+     (user-from-req req))))
 
 (defn create-session-cookie [user-id]
   {SESSION_KEY {:value (create-session user-id)
                 :secure true
                 :http-only true
                 :same-site :strict
+                :path "/"
                 :max-age SESSION_AGE_MILLISECONDS}})
