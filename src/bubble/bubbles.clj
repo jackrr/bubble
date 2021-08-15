@@ -5,6 +5,7 @@
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
             [bubble.nav :refer [redirect-home-with-error]]
+            [bubble.users :as [users]]
             [ring.util.response :refer [redirect]]))
 
 (defn at-max-enrollments? [user-id]
@@ -111,7 +112,7 @@
        [:a {:href "/"} "Back to home"]]
       [:ul
        (map (fn [user]
-              [:li (:users/name user)])
+              [:li (users/user->handle user)])
             (bubble-members param-id))]])))
 
 (defn index-page [req]
@@ -122,7 +123,7 @@
       (when-let [error (get-in req [:params :error])]
         [:h2 (str "Error: " error)])
       [:h2
-       (str "Welcome back " (:users/name user) ".")
+       (str "Welcome back " (users/user->handle user) ".")
        [:a (assoc
             (views/style :font-size "16px" :padding-left "16px" :text-decoration "none")
             :href (str "profiles/" user-id "/edit")) "(edit username)"]]

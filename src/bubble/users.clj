@@ -39,3 +39,6 @@
                                :user-id
                                java.util.UUID/fromString)])
      (redirect "/"))))
+
+(defn user->handle [user]
+  (or (:users/name user) (:users/phone user)))
