@@ -3,6 +3,7 @@
   (:require [bubble.config :as config]
             [bubble.db :refer [db]]
             [bubble.phone :as phone]
+            [bubble.users :as users]
             [clj-http.client :as client]
             [clojure.data.xml :as xml]
             [clojure.walk :refer [stringify-keys]]
@@ -91,8 +92,7 @@
                (map (fn [bubble-user-sender]
                       (send-message {:to (:users/phone bubble-user-sender)
                                      :from (:senders/phone bubble-user-sender)
-                                     :body (str msg " - From " (or (:users/name data)
-                                                                   (:users/phone data)))}))
+                                     :body (str msg " - From " (users/user->handle data))}))
                     recipients))
               (empty-response)))
           (message-response

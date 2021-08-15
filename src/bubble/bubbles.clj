@@ -4,6 +4,8 @@
             [bubble.config :refer [base-url]]
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
+            [bubble.nav :refer [redirect-home-with-error]]
+            [bubble.users :as [users]]
             [ring.util.response :refer [redirect]]))
 
 (defn at-max-enrollments? [user-id]
@@ -31,10 +33,6 @@
        ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"
         bubble-id user-id sender-id])))
   (delivery/send-welcome-message bubble-id user-id))
-
-(defn redirect-home-with-error [msg]
-  (redirect (str "/?" (ring.util.codec/form-encode
-                       {:error msg}))))
 
 (defn optin [req]
   (let [id (get-in req [:params :id])
@@ -114,26 +112,31 @@
        [:a {:href "/"} "Back to home"]]
       [:ul
        (map (fn [user]
-    ;; TODO: show names members once we have name capture
-              [:li (:users/phone user) " " (:users/name user)])
+              [:li (users/user->handle user)])
             (bubble-members param-id))]])))
 
 (defn index-page [req]
-  (let [user-id (get-in req [:current-user :users/id])]
-  (views/base-view
-   [[:h1 "Bubble Thread"]
-    (when-let [error (get-in req [:params :error])]
-      [:h2 (str "Error: " error)])
-    [:h2 (str "You are enrolled in " (my-bubble-count user-id) " bubbles.")]
-    [:h3 (str "To blow a bubble, add a bubble name below. Then invite other people to enroll in that bubble.")]
-    ;; TODO: should only show bubbles i'm in
-    [:ul
-     (map (fn [bubble]
-            [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]]) (my-bubble-info user-id))]
-    [:form {:action "/newbubble" :method "post"}
-     [:input {:placeholder "Name of Bubble" :name "bubblename"}]
-     [:span (str "   ")]
-     [:button () "blow bubble"]]
-     [:p]
-     [:form {:action "/logout" :method "post"}
-     [:button "Log out"]]])))
+  (let [user (:current-user req)
+        user-id (:users/id user)]
+    (views/base-view
+     [[:h1 "Bubble Thread"]
+      (when-let [error (get-in req [:params :error])]
+        [:h2 (str "Error: " error)])
+      [:h2
+       (str "Welcome back " (users/user->handle user) ".")
+       [:a (assoc
+            (views/style :font-size "16px" :padding-left "16px" :text-decoration "none")
+            :href (str "profiles/" user-id "/edit")) "(edit username)"]]
+      [:h3 (str "You are enrolled in " (my-bubble-count user-id) " bubbles.")]
+      [:h4 "To blow a bubble, add a bubble name below. Then invite other people to enroll in that bubble."]
+      [:ul
+       (map (fn [bubble]
+              [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]])
+            (my-bubble-info user-id))]
+      [:form {:action "/newbubble" :method "post"}
+       [:input {:placeholder "Name of Bubble" :name "bubblename"}]
+       [:span "   "]
+       [:button "blow bubble"]]
+      [:p]
+      [:form {:action "/logout" :method "post"}
+       [:button "Log out"]]])))

@@ -4,13 +4,13 @@
             [bubble.delivery.sms :as delivery.sms]
             [bubble.login :as login]
             [bubble.login.session :as login.session]
+            [bubble.users :as users]
             [bubble.views :as views]
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.logger :as logger]
             [ring.middleware.cookies :refer [wrap-cookies]]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [bubble.delivery :as delivery]))
+            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
 (defroutes app-routes
   ;; bubble management
@@ -29,6 +29,11 @@
   (POST "/login" req (login/handle-request req))
   (GET "/login-code/:code" req (login/handle-code req))
   (POST "/login-code" req (login/handle-short-code req))
+
+  ;; profile
+  (GET "/profiles/:user-id/edit" req (login/logged-in req users/edit-page))
+  (POST "/profiles/:user-id" req (login/logged-in req users/update-profile))
+
   (route/not-found "Not Found"))
 
 (def app
