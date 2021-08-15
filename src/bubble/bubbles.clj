@@ -4,6 +4,7 @@
             [bubble.config :refer [base-url]]
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
+            [bubble.nav :refer [redirect-home-with-error]]
             [ring.util.response :refer [redirect]]))
 
 (defn at-max-enrollments? [user-id]
@@ -31,10 +32,6 @@
        ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"
         bubble-id user-id sender-id])))
   (delivery/send-welcome-message bubble-id user-id))
-
-(defn redirect-home-with-error [msg]
-  (redirect (str "/?" (ring.util.codec/form-encode
-                       {:error msg}))))
 
 (defn optin [req]
   (let [id (get-in req [:params :id])
