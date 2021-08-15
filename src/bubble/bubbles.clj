@@ -75,6 +75,10 @@
    ["select * from bubbles_users bu join users on bu.user_id = users.id where bu.bubble_id = ?"
     (java.util.UUID/fromString bubble-id)]))
 
+(defn member? [bubble-id user-id]
+  (< 0 (count (sql/execute! db ["select * from bubbles_users where bubble_id = ? and user_id = ?"
+                                bubble-id user-id]))))
+
 (defn bubble-count []
   (:count (sql/execute-one! db ["select count(*) from bubbles"])))
 
@@ -101,19 +105,21 @@
   (let [{:keys [params uri]} req
         param-id (get params :id)
         bubble (fetch-bubble param-id)]
-    (views/base-view
-     [[:h1 (:bubbles/name bubble)]
-      (into [:p "To invite new members share the following link: "]
-            (let [join-link (str base-url "/bubble/" param-id "/join")]
-              [[:a {:href join-link} join-link]
-               " or "
-               [:a {:href (str "sms:?&" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
-      [:div
-       [:a {:href "/"} "Back to home"]]
-      [:ul
-       (map (fn [user]
-              [:li (users/user->handle user)])
-            (bubble-members param-id))]])))
+    (if (member? (:bubbles/id bubble) (-> req :current-user :users/id))
+      (views/base-view
+       [[:h1 (:bubbles/name bubble)]
+        (into [:p "To invite new members share the following link: "]
+              (let [join-link (str base-url "/bubble/" param-id "/join")]
+                [[:a {:href join-link} join-link]
+                 " or "
+                 [:a {:href (str "sms:?&" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
+        [:div
+         [:a {:href "/"} "Back to home"]]
+        [:ul
+         (map (fn [user]
+                [:li (users/user->handle user)])
+              (bubble-members param-id))]])
+      (redirect-home-with-error "Not allowed to see that."))))
 
 (defn index-page [req]
   (let [user (:current-user req)
