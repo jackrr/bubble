@@ -5,7 +5,7 @@
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
             [bubble.nav :refer [redirect-home-with-error]]
-            [bubble.users :as [users]]
+            [bubble.users :as users]
             [ring.util.response :refer [redirect]]))
 
 (defn at-max-enrollments? [user-id]
