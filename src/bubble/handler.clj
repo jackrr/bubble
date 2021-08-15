@@ -16,7 +16,7 @@
   ;; bubble management
   (GET "/" req (login/logged-in req bubbles/index-page))
   (POST "/newbubble" req (login/logged-in req bubbles/make-bubble))
-  (GET "/bubble/:id" req (bubbles/bubble-page req))
+  (GET "/bubble/:id" req (login/logged-in req bubbles/bubble-page))
   (GET "/bubble/:id/join" req (bubbles/join-bubble-form req))
   (GET "/bubble/:id/optin" req (login/logged-in req bubbles/optin))
 
