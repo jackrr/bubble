@@ -40,7 +40,10 @@
                        [:input {:name "phone" :placeholder "phone number"}]
                        [:p]
                        [:input {:name "short-code" :type "checkbox"}]
-                       [:label {:for "short-code"} "Send a code instead"]
+                       [:label {:for "short-code"} "Send me a short code"]
+                       [:span (views/style :padding-right "16px")]
+                       [:input {:name "link" :type "checkbox"}]
+                       [:label {:for "link"} "Send me a link"]
                        [:p]
                        [:button {:name "submit"} "Send me a link"]]])))
 
