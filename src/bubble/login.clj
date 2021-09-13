@@ -72,7 +72,7 @@
         phone (-> params
                   :phone
                   phone/parse-phone)
-        use-short-code? (= "short-code" (:one params))]
+        use-short-code? (= "short-code" (:sms_short_code params))]
     (if phone
       (let [login-code (code/create-code (:users/id
                                           (find-or-create-user! {:phone phone :name name}))
