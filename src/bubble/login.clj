@@ -39,13 +39,13 @@
                        [:p]
                        [:input {:name "phone" :placeholder "phone number"}]
                        [:p]
-                       [:input {:name "short-code" :type "checkbox"}]
+                       [:input {:value "short-code" :name "one" :type "radio"}]
                        [:label {:for "short-code"} "Send me a short code"]
                        [:span (views/style :padding-right "16px")]
-                       [:input {:name "link" :type "checkbox"}]
+                       [:input {:value "link" :name "one" :type "radio"}]
                        [:label {:for "link"} "Send me a link"]
                        [:p]
-                       [:button {:name "submit"} "Send me a link"]]])))
+                       [:button {:name "submit"} "Send me a shortcode or a link"]]])))
 
 (defn login-response [user-id]
   (if user-id
@@ -72,7 +72,7 @@
         phone (-> params
                   :phone
                   phone/parse-phone)
-        use-short-code? (boolean (:short-code params))]
+        use-short-code? (= "short-code" (:one params))]
     (if phone
       (let [login-code (code/create-code (:users/id
                                           (find-or-create-user! {:phone phone :name name}))
