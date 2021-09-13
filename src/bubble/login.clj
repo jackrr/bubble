@@ -39,10 +39,10 @@
                        [:p]
                        [:input {:name "phone" :placeholder "phone number"}]
                        [:p]
-                       [:input {:value "short-code" :name "one" :type "radio"}]
+                       [:input {:value "short-code" :name "sms_short_code" :type "radio"}]
                        [:label {:for "short-code"} "Send me a short code"]
                        [:span (views/style :padding-right "16px")]
-                       [:input {:value "link" :name "one" :type "radio"}]
+                       [:input {:value "link" :name "sms_short_code" :type "radio"}]
                        [:label {:for "link"} "Send me a link"]
                        [:p]
                        [:button {:name "submit"} "Send me a shortcode or a link"]]])))
