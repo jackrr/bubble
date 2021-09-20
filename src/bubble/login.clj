@@ -28,10 +28,10 @@
     (views/base-view [[:h1 "Login"]
                       [:div "Welcome to *bubble thread*. We're happy you're here."]
                       [:p]
-                      [:div "Bubble thread is a tool that allows members to create and collaboratively structure groups of people (bubbles!)
-                      and their text communications (threads!). All communications are currently delivered via SMS, but we're planning to add email as well."]
+                      [:div "Bubble thread is a tool that allows members to collaboratively create communication threads (threads!) with groups of people (bubbles!).
+                      All communications are currently delivered via SMS, but we're planning to add email as well."]
                       [:p]
-                      [:div "Add a username and phone number below to get a login link. Then can start creating bubbles and inviting people to join them."]
+                      [:div "Add a username and phone number below to get a login link. Then you can start creating bubbles and inviting people to join them."]
                       [:p]
                       (when error [:p (str "Error: " error)])
                       [:form {:action "/login" :method "post"}
