@@ -133,7 +133,8 @@
        [:a (assoc
             (views/style :font-size "16px" :padding-left "16px" :text-decoration "none")
             :href (str "profiles/" user-id "/edit")) "(edit username)"]]
-      [:h3 (str "You are enrolled in " (my-bubble-count user-id) " bubbles. You can manage your active bubbles below.")]
+
+      [:h3 (str "You are enrolled in " (my-bubble-count user-id) " bubbles. " (if (> (my-bubble-count user-id) 0) "You can manage your active bubbles below." ""))]
       [:ul
        (map (fn [bubble]
               [:li [:a {:href (str "bubble/" (:bubbles/id bubble))} (:bubbles/name bubble)]])
