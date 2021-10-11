@@ -54,8 +54,11 @@
     (login-error-redirect "Invalid or expired code. Please try again.")))
 
 (defn handle-short-code [{:keys [session params]}]
-  (login-response (code/user-id-for-code {:short-code (:code params)
-                                          :code (:login-nonce session)})))
+  (println "Handling short code")
+  (let [user-id (code/user-id-for-code {:short-code (:code params)
+                                        :code (:login-nonce session)})]
+    (println (str  "User id is '" user-id "'") )
+    (login-response user-id)))
 
 (defn handle-code [{{code :code} :params}]
   (login-response (code/user-id-for-code {:code code})))
