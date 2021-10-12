@@ -1,30 +1,18 @@
 (ns bubble.login.session
   (:require [bubble.db :refer [db]]
-            [dotenv :refer [env]]
-            [lock-key.core :refer [decrypt-from-base64 encrypt-as-base64]]
             [next.jdbc :as sql]
             [ring.middleware.session.cookie :as ring-cookie]))
 
 ;; 1 hour
 (def SESSION_AGE_MILLISECONDS (* 60 60 1000))
 (def SESSION_KEY "session-id")
-(def SECRET_KEY (or (env "AUTH_SECRET") "super secret password"))
 
 (defn- expire-at []
   (java.util.Date. (+ SESSION_AGE_MILLISECONDS (System/currentTimeMillis))))
 
-(defn- decrypt [token]
-  (try
-    (decrypt-from-base64 token SECRET_KEY)
-    (catch javax.crypto.IllegalBlockSizeException e
-      (do
-        (println (str "Failed to decrypt session cookie: " (.getMessage e)))
-        nil))))
-
 (defn- session-id-from-req [{:keys [cookies]}]
   (some-> cookies
           (get-in [SESSION_KEY :value])
-          decrypt
           java.util.UUID/fromString))
 
 (defn- delete-expired-sessions! []
@@ -40,9 +28,7 @@
                  {:return-keys true})
         session-id (str (:sessions/id session))]
     (println (str "session-id is " session-id))
-    (let [encrypted (encrypt-as-base64 session-id SECRET_KEY)]
-      (println (str "encrypted is " encrypted))
-      encrypted))
+    session-id)
 
 
   ;; (->
