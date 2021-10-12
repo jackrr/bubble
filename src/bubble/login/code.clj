@@ -18,7 +18,6 @@
       sha1))
 
 (defn delete-expired-codes! []
-  (println "Deleting expired codes..")
   (sql/execute! db ["delete from login_codes where expires_at < ?" (java.util.Date.)]))
 
 (defn create-code [user-id short]
@@ -32,7 +31,6 @@
 
 (defn user-id-for-code [{:keys [code short-code]}]
   (delete-expired-codes!)
-  (println (str "Looking up user id for code: '" code "', short code: '" short-code "'"))
   (when code (:login_codes/user_id
               (sql/execute-one!
                db

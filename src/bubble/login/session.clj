@@ -19,28 +19,15 @@
   (sql/execute! db ["delete from sessions where expires_at < ?" (java.util.Date.)]))
 
 (defn- create-session [user-id]
-  (println "Deleting expired sessions...")
   (delete-expired-sessions!)
-  (let [session (sql/execute-one!
-                 db
-                 ["insert into sessions (user_id, expires_at) values (?,?)"
-                  user-id (expire-at)]
-                 {:return-keys true})
-        session-id (str (:sessions/id session))]
-    (println (str "session-id is " session-id))
-    session-id)
-
-
-  ;; (->
-  ;;  (sql/execute-one!
-  ;;   db
-  ;;   ["insert into sessions (user_id, expires_at) values (?,?)"
-  ;;    user-id (expire-at)]
-  ;;   {:return-keys true})
-  ;;  :sessions/id
-  ;;  str
-  ;;  (encrypt-as-base64 SECRET_KEY))
-  )
+  (->
+   (sql/execute-one!
+    db
+    ["insert into sessions (user_id, expires_at) values (?,?)"
+     user-id (expire-at)]
+    {:return-keys true})
+   :sessions/id
+   str))
 
 (defn- extend-session [req]
   (when-let [session-id (session-id-from-req req)]
