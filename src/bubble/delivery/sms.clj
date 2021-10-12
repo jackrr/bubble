@@ -63,7 +63,9 @@
   (let [params (:params req)]
     (if (not (.validate
               (new RequestValidator auth-token)
-              (or (env "HOST") (request-url req))
+              (if-let [host (env "HOST")]
+                (str host "/incoming-sms")
+                (request-url req))
               (stringify-keys params)
               (get-header req  "X-Twilio-Signature")))
       (status (response "Invalid signature") 400)
