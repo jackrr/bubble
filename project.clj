@@ -14,7 +14,6 @@
                  [lynxeyes/dotenv "1.1.0"]
                  [environ "1.2.0"]
                  [hiccup "1.0.5"]
-                 [lock-key "1.5.0"]
                  [com.github.seancorfield/next.jdbc "1.1.646"]
                  [org.postgresql/postgresql "42.2.19.jre7"]
                  [ring/ring-defaults "0.3.2"]
