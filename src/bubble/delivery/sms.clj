@@ -56,7 +56,9 @@
 
 (defn message-response [msg]
   (xml-response (xml/element :Response
+                             {}
                              (xml/element :Message
+                                          {}
                                           (xml/element :Body {} msg)))))
 
 (defn handle-inbound-sms [req]
@@ -102,6 +104,7 @@
 
 (comment
   (send-message {:to "" :body "Hello there!"})
+  (:body (message-response "test message"))
   account-sid
 
   (-> env keys sort)
