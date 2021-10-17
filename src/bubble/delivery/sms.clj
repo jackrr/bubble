@@ -43,7 +43,8 @@
     (client/post (str api-base "/IncomingPhoneNumbers.json")
                  (req-payload {:form-params {:PhoneNumber phone-number
                                              :SmsUrl incoming-sms-url}}))
-    phone-number))
+    ;; Omit leading "+" character from Twilio
+    (subs phone-number 1)))
 
 (defn- xml-response [xml-obj]
   (-> xml-obj
