@@ -82,6 +82,10 @@
                         "join senders s on bu.sender_id = s.id "
                         "where u.phone = ? and s.phone = ?")
                    user-phone sender-phone])]
+        (println params)
+        (println (str "sender: " sender-phone))
+        (println (str "user: " user-phone))
+        (println data)
         (if data
           (do
             (let [recipients (sql/execute!
