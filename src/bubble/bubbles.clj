@@ -4,7 +4,7 @@
             [bubble.config :refer [base-url]]
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
-            [bubble.nav :refer [redirect-home-with-error]]
+            [bubble.nav :refer [redirect-home-with-error redirect-home-with-message]]
             [bubble.users :as users]
             [ring.util.response :refer [redirect]]))
 
@@ -33,6 +33,12 @@
        ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"
         bubble-id user-id sender-id])))
   (delivery/send-welcome-message bubble-id user-id))
+
+(defn- remove-member [bubble-id user-id]
+  (sql/execute-one!
+    db
+    ["DELETE FROM bubbles_users WHERE bubble_id = ? AND user_id = ?"
+     (java.util.UUID/fromString bubble-id) user-id]))
 
 (defn optin [req]
   (let [id (get-in req [:params :id])
@@ -89,6 +95,17 @@
   (sql/execute-one! db ["INSERT INTO bubbles (name) VALUES (?)" name]
                     {:return-keys true}))
 
+(defn unenroll [req]
+  (let [{:keys [params current-user]} req
+        bubble-id (:id params)]
+    (println (:id params) (:users/id current-user))
+    (remove-member (:id params) (:users/id current-user))
+    (redirect-home-with-message
+     (str "You have been removed from bubble "
+          (-> bubble-id
+              fetch-bubble
+              :bubbles/name)))))
+
 (defn make-bubble [req]
   (let [{:keys [params current-user]} req
         bubble-name (get params :bubblename)
@@ -136,6 +153,8 @@
      [[:h1 "Bubble Thread"]
       (when-let [error (get-in req [:params :error])]
         [:h2 (str "Error: " error)])
+      (when-let [message (get-in req [:params :message])]
+        [:h2 (str "Message: " message)])
       [:h2
        (str "Welcome back " (users/user->handle user) ".")
        [:a (assoc

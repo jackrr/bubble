@@ -19,6 +19,7 @@
   (GET "/bubble/:id" req (login/logged-in req bubbles/bubble-page))
   (GET "/bubble/:id/join" req (bubbles/join-bubble-form req))
   (GET "/bubble/:id/optin" req (login/logged-in req bubbles/optin))
+  (POST "/bubbles/:id/unenroll" req (login/logged-in req bubbles/unenroll))
 
   ;; thread management
   (POST "/incoming-sms" req (delivery.sms/handle-inbound-sms req))
