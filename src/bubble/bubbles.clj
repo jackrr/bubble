@@ -104,8 +104,9 @@
 (defn bubble-page [req]
   (let [{:keys [params uri]} req
         param-id (get params :id)
-        bubble (fetch-bubble param-id)]
-    (if (member? (:bubbles/id bubble) (-> req :current-user :users/id))
+        bubble (fetch-bubble param-id)
+        bubble-id (:bubbles/id bubble)]
+    (if (member? bubble-id (-> req :current-user :users/id))
       (views/base-view
        [[:h1 (:bubbles/name bubble)]
         (into [:p "To invite new members share the following link: "]
@@ -114,11 +115,18 @@
                  " or "
                  [:a {:href (str "sms:?&" (ring.util.codec/form-encode {:body (str "Join my bubble: " join-link)}))} "Share link via SMS"]]))
         [:div
-         [:a {:href "/"} "Back to home"]]
-        [:ul
-         (map (fn [user]
-                [:li (users/user->handle user)])
-              (bubble-members param-id))]])
+         (views/style :display "flex"
+                      :gap "16px"
+                      :align-items "center")
+         [:a {:href "/"} "Back to home"]
+         [:form {:action (str "/bubbles/" bubble-id "/unenroll") :method "post"}
+          [:button "Unenroll from this bubble"]]]
+        [:div
+         [:h3 "Members"]
+         [:ul
+          (map (fn [user]
+                 [:li (users/user->handle user)])
+               (bubble-members param-id))]]])
       (redirect-home-with-error "Not allowed to see that."))))
 
 (defn index-page [req]
