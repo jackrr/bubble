@@ -5,3 +5,7 @@
 (defn redirect-home-with-error [msg]
   (redirect (str "/?" (c/form-encode
                        {:error msg}))))
+
+(defn redirect-home-with-message [msg]
+  (redirect (str "/?" (c/form-encode
+                       {:message msg}))))
