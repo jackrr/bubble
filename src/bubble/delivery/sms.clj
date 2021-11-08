@@ -72,7 +72,7 @@
             msg (:Body params)
             data (sql/execute-one!
                   db
-                  [(str "select u.id,u.phone,bu.bubble_id "
+                  [(str "select u.id,u.name,u.phone,bu.bubble_id "
                         "from users u "
                         "join bubbles_users bu on bu.user_id = u.id "
                         "join senders s on bu.sender_id = s.id "
