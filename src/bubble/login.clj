@@ -54,8 +54,9 @@
     (login-error-redirect "Invalid or expired code. Please try again.")))
 
 (defn handle-short-code [{:keys [session params]}]
-  (login-response (code/user-id-for-code {:short-code (:code params)
-                                          :code (:login-nonce session)})))
+  (let [user-id (code/user-id-for-code {:short-code (:code params)
+                                        :code (:login-nonce session)})]
+    (login-response user-id)))
 
 (defn handle-code [{{code :code} :params}]
   (login-response (code/user-id-for-code {:code code})))

@@ -43,7 +43,8 @@
     (client/post (str api-base "/IncomingPhoneNumbers.json")
                  (req-payload {:form-params {:PhoneNumber phone-number
                                              :SmsUrl incoming-sms-url}}))
-    phone-number))
+    ;; Omit leading "+" character from Twilio
+    (subs phone-number 1)))
 
 (defn- xml-response [xml-obj]
   (-> xml-obj
@@ -56,14 +57,18 @@
 
 (defn message-response [msg]
   (xml-response (xml/element :Response
+                             {}
                              (xml/element :Message
+                                          {}
                                           (xml/element :Body {} msg)))))
 
 (defn handle-inbound-sms [req]
   (let [params (:params req)]
     (if (not (.validate
               (new RequestValidator auth-token)
-              (request-url req)
+              (if-let [host (env "HOST")]
+                (str host "/incoming-sms")
+                (request-url req))
               (stringify-keys params)
               (get-header req  "X-Twilio-Signature")))
       (status (response "Invalid signature") 400)
@@ -100,6 +105,7 @@
 
 (comment
   (send-message {:to "" :body "Hello there!"})
+  (:body (message-response "test message"))
   account-sid
 
   (-> env keys sort)
