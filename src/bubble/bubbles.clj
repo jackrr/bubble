@@ -60,6 +60,7 @@
 
 (defn join-bubble-form [req]
   (let [id (get-in req [:params :id])]
+    ;; TODO: get current user if present, to change copy
     (views/base-view [[:h1 "Login to join bubble " (get-in (fetch-bubble-name id) [:bubbles/name])]
                       [:p "There are this many people in the bubble: " (get-in (count-bubble-members id) [:count])]
                       [:p "You can join this bubble here"]
