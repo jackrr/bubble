@@ -4,6 +4,7 @@
             [bubble.config :refer [base-url]]
             [bubble.db :refer [db]]
             [bubble.delivery :as delivery]
+            [bubble.login.session :as session]
             [bubble.nav :refer [redirect-home-with-error redirect-home-with-message]]
             [bubble.users :as users]
             [ring.util.response :refer [redirect]]))
@@ -59,13 +60,18 @@
     (java.util.UUID/fromString bubble-id)]))
 
 (defn join-bubble-form [req]
-  (let [id (get-in req [:params :id])]
-    ;; TODO: get current user if present, to change copy
-    (views/base-view [[:h1 "Login to join bubble " (get-in (fetch-bubble-name id) [:bubbles/name])]
-                      [:p "There are this many people in the bubble: " (get-in (count-bubble-members id) [:count])]
-                      [:p "You can join this bubble here"]
+  (let [id (get-in req [:params :id])
+        user (session/current-user req {:extend true})]
+    (views/base-view [[:h1 "Join bubble " (get-in (fetch-bubble-name id) [:bubbles/name])]
+                      [:p (let [member-count (get-in (count-bubble-members id) [:count])]
+                            (if (= member-count 1)
+                              "There is 1 person in the bubble."
+                              (str "There are " member-count " people in the bubble.")))]
+                      (when (not user) [:p "You are not logged in. You need to login or create an account in order to join this bubble."])
                       [:a {:href (str "/bubble/" id "/optin")}
-                       [:button {:name "submit"} "Join bubble"]]])))
+                       [:button (if user
+                                  "Join bubble now"
+                                  "Proceed to login")]]])))
 
 (defn bubble-info []
   (sql/execute! db ["select name, id from bubbles"]))
