@@ -45,3 +45,10 @@
                        :body (str "You have successfully joined bubble " (:bubbles/name data)
                                   ". It has " member-count " members."
                                   " Simply reply to send a message to everyone.")})))
+
+;(defn notify-bubble-about-join
+  ;find members of bubble
+  ;compose message
+  ;send the  same message to each member of the bubble except the joining member
+  ;jack recommends looking at deliver/sms
+  ;)
