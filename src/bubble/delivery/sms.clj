@@ -97,7 +97,7 @@
                (map (fn [bubble-user-sender]
                       (send-message {:to (:users/phone bubble-user-sender)
                                      :from (:senders/phone bubble-user-sender)
-                                     :body (str msg " - From " (users/user->handle data))}))
+                                     :body (str (users/user->handle data) ": " msg)}))
                     recipients))
               (empty-response)))
           (message-response
