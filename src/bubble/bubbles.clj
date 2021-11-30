@@ -33,7 +33,8 @@
        tx
        ["INSERT INTO bubbles_users (bubble_id, user_id, sender_id) VALUES (?,?,?)"
         bubble-id user-id sender-id])))
-  (delivery/send-welcome-message bubble-id user-id))
+  (delivery/send-welcome-message bubble-id user-id)
+  (delivery/notify-bubble-about-join bubble-id user-id))
 
 (defn- remove-member [bubble-id user-id]
   (sql/execute-one!

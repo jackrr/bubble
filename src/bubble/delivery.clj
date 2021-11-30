@@ -46,9 +46,20 @@
                                   ". It has " member-count " members."
                                   " Simply reply to send a message to everyone.")})))
 
-;(defn notify-bubble-about-join
-  ;find members of bubble
-  ;compose message
-  ;send the  same message to each member of the bubble except the joining member
-  ;jack recommends looking at deliver/sms
-  ;)
+(defn notify-bubble-about-join [bubble-id user-id]
+ (doall
+  (map (fn [data]
+         (sms/send-message {:to (users/phone data)
+                            :from (:senders/phone data)
+                            :body (str "A new person has joined but we're not gonna say who!")}))
+         (get-users-in-bubble bubble-id user-id))))
+
+(defn get-users-in-bubble [bubble-id user-id]
+  (sql/execute!
+    db
+    [(str "select u.phone,s.phone "
+          "from users u "
+          "join bubbles_users bu on bu.user_id = u.id "
+          "join senders s on bu.sender_id = s.id "
+          "where u.id != ? and bu.bubble_id = ?")
+          user-id bubble-id]))
