@@ -42,3 +42,6 @@
 
 (defn user->handle [user]
   (or (:users/name user) (:users/phone user)))
+
+(defn get-user [user-id]
+  (sql/execute-one! db ["select * from users where id = ?" user-id]))
