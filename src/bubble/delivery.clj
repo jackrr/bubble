@@ -47,15 +47,6 @@
                                   ". It has " member-count " members."
                                   " Simply reply to send a message to everyone.")})))
 
-(defn notify-bubble-about-join [bubble-id user-id]
-  (let [username (users/user->handle (users/get-user user-id))]
-    (doall
-     (map (fn [data]
-            (sms/send-message {:to (users/phone data)
-                               :from (:senders/phone data)
-                               :body (str username " just joined!")}))
-          (get-users-in-bubble bubble-id user-id)))))
-
 (defn get-users-in-bubble [bubble-id user-id]
   (sql/execute!
     db
@@ -65,3 +56,12 @@
           "join senders s on bu.sender_id = s.id "
           "where u.id != ? and bu.bubble_id = ?")
           user-id bubble-id]))
+
+(defn notify-bubble-about-join [bubble-id user-id]
+  (let [username (users/user->handle (users/get-user user-id))]
+    (doall
+     (map (fn [data]
+            (sms/send-message {:to (:users/phone data)
+                               :from (:senders/phone data)
+                               :body (str username " just joined!")}))
+          (get-users-in-bubble bubble-id user-id)))))
