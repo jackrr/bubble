@@ -83,6 +83,7 @@
                         "join senders s on bu.sender_id = s.id "
                         "where u.phone = ? and s.phone = ?")
                    user-phone sender-phone])]
+      ;(incoming-message-machine sender-phone user-phone msg)
         (if data
           (do
             (let [recipients (sql/execute!
