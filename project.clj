@@ -5,6 +5,7 @@
   :dependencies [[compojure "1.6.1"]
                  [cheshire "5.10.0"]
                  [clj-http "3.12.0"]
+                 [metosin/tilakone "0.0.4"]
                  [org.slf4j/slf4j-api "1.7.32"]
                  [org.slf4j/slf4j-simple "1.7.32"]
                  [org.clojure/clojure "1.10.0"]

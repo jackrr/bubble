@@ -13,7 +13,7 @@
 
 - Update welcome message to contain additional instructions: "Send 'help' to get a lowdown of anything you can do'"
 
-1. Send 'help' to bubble
+1. Send '.help' to bubble
 1. Message DOES NOT forward to all memebers
 1. Receive SMS of instructions of available actions in bubble (invite only for now)
 
@@ -21,7 +21,7 @@
 
 #### In-thread invite macro
 
-1. Send "Invite: 1111111111" in bubble
+1. Send ".Invite: 1111111111" in bubble
 1. Message DOES NOT forward to all members
 1. GOTO "Joining" flow for person with # 1111111111
 1. Send confirmation of invite to all members: "Jack invited a new member"
