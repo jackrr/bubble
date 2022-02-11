@@ -1,14 +1,23 @@
 (ns bubble.incoming-sms
   (:require [tilakone.core :as tk :refer [_]]))
 
+(def user-thread-state-chart
 ; State definitions, pure data here:
-{::tk/states [{::tk/name :menu-start
-               ::tk/transitions [{::tk/on #"\.help" ::tk/to :menu-start ::tk/actions [:send-help] }]}]
- ::tk/action! (fn [{::tk/keys [action]}]
+{::tk/states [{::tk/name :listening
+               ::tk/transitions [{::tk/on #"\.help" ::tk/to :listening ::tk/actions [:send-help-menu]}
+                                 {::tk/on #"\.invite" ::tk/to :listening ::tk/actions [:send-invite-prompt :send-confirmation]}
+                                 ;;{::tk/on #"\.leave" ::tk.to :leaving ::tk/actions [:send-leave-prompt] }
+                                 ]}
+              {::tk/name :invited
+                ::tk/transitions [{::tk/on #"\.*" ::tk/to :listening ::tk/actions [:join] }]
+               
+ ::tk/action! (fn [& args]
+                (println args)
                 ;; TODO: implement me
                 )
- ::tk/matcher? (fn [value regex] (some? (re-matches regex value)))}
+ ::tk/matcher? (fn [value regex] (some? (re-matches regex value)))})
 
+(tk/apply-signal user-thread-state-chart "whatever")
 
 {:name :menu
  :states []}
