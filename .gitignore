@@ -12,3 +12,4 @@ pom.xml.asc
 /.nrepl-port
 /_local_db
 k8s/
+.calva/

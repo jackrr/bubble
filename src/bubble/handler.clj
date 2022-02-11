@@ -9,6 +9,7 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.logger :as logger]
+            [bubble.incoming-sms]
             [ring.middleware.cookies :refer [wrap-cookies]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 

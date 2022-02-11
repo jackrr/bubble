@@ -9,22 +9,17 @@
                                  ;;{::tk/on #"\.leave" ::tk.to :leaving ::tk/actions [:send-leave-prompt] }
                                  ]}
               {::tk/name :invited
-                ::tk/transitions [{::tk/on #"\.*" ::tk/to :listening ::tk/actions [:join] }]
-               
+               ::tk/transitions [{::tk/on #"\.*" ::tk/to :listening ::tk/actions [:join]}]}]
+
  ::tk/action! (fn [& args]
                 (println args)
                 ;; TODO: implement me
                 )
- ::tk/matcher? (fn [value regex] (some? (re-matches regex value)))})
+ ::tk/match?
+ (fn [{::tk/keys [on signal] :as payload}] (println "here" on signal payload) (when on (some? (re-matches on signal))))
+ ::tk/state   :listening})
 
-(tk/apply-signal user-thread-state-chart "whatever")
-
-{:name :menu
- :states []}
-{:name :invite
- :states []}
-{:name :join
- : [{:}]}
+(tk/apply-signal user-thread-state-chart ".help")
 
 (defn next-action [body bubble-id user-id]
   ;; Decision-making logic here
